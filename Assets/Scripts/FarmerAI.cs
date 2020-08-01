@@ -5,51 +5,37 @@ using UnityEngine.AI;
 
 public class FarmerAI : MonoBehaviour
 {
-    public NavMeshAgent agent;
-    public float wanderRadius;
-    public float wanderTimer;
-    public GameObject currTarget;
+    public float fleeDistance;
 
-    float timer;
+    GameObject currTarget;
+    
     Animator anim;
-    //GameObject[] plants;
     float minDist;
     TreeListController tl;
 
+    GameObject[] allPlayers;
+    List<GameObject> fleeFromPlayers;
+
+    public GameObject CurrTarget { get => currTarget; set => currTarget = value; }
+    public List<GameObject> FleeFromPlayers { get => fleeFromPlayers; set => fleeFromPlayers = value; }
 
     // Start is called before the first frame update
     void Start()
     {
         anim = this.GetComponent<Animator>();
 
-        //plants = GameObject.FindGameObjectsWithTag("Plant");
-
         tl = GameObject.FindObjectOfType<TreeListController>();
-
-        timer = wanderTimer;
-        
+        allPlayers = GameObject.FindGameObjectsWithTag("Player");
+        fleeFromPlayers = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*if(tl.treeList.Count == 0)
-        {
-            //walk and idle randomly
-            timer += Time.deltaTime;
-
-            if (timer >= wanderTimer)
-            {
-                Vector3 newPos = RandomNavSphere(transform.position, wanderRadius, -1);
-                agent.SetDestination(newPos);
-                timer = 0;
-            }
-
-        }*/
-
         if(anim.GetInteger("State") == (int)Transition.IDLE && tl.treeList.Count!=0)
         {
             //find the nearest tree that is not targeted
+            //TODO: check if tree is already being cut
             GameObject nearest = tl.treeList[0];
             minDist = -1.0F;
             foreach(GameObject plant in tl.treeList)
@@ -67,55 +53,29 @@ public class FarmerAI : MonoBehaviour
             //set state to walktotarget
             anim.SetInteger("State", (int)Transition.WALKTOTARGET);
 
-            //set walking to true
-            //anim.SetBool("isWalking", true);
-            //agent.SetDestination(nearest.transform.position);
             
-
-            //direction = (transform.position - nearest.transform.position) / minDist;
-            //direction = new Vector3(direction.x, 0, direction.z);
 
             //set plant status to isTarget
             TreeControl tc = nearest.GetComponent<TreeControl>();
             tc.isTarget = true;
-
         }
-        
+
+        CheckIfShouldFlee();
 
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void CheckIfShouldFlee()
     {
-        //Debug.Log("collide");
-        if (collision.collider.CompareTag("Plant"))
+        foreach(GameObject player in allPlayers)
         {
-            agent.velocity = Vector3.zero;
-            agent.isStopped = true;
-
-            //start cutting
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isCutting", true);
-
-            //turn off nav, turn on rigidbody
-            this.GetComponent<NavMeshAgent>().enabled = false;
-            this.GetComponent<Rigidbody>().isKinematic = false;
-
-            //set plant status to cutting
-
+            if(Vector3.Distance(player.transform.position, this.transform.position) <= fleeDistance)
+            {
+                //set state to flee
+                if(anim.GetInteger("State") != (int)Transition.FLEE) { anim.SetInteger("State", (int)Transition.FLEE); }  //does setting state again calls onenter repeatedly?
+                
+                fleeFromPlayers.Add(player);
+            }
         }
     }
-
-    private Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
-    {
-        Vector3 randDirection = Random.insideUnitSphere * dist;
-
-        randDirection += origin;
-
-        NavMeshHit navHit;
-
-        NavMesh.SamplePosition(randDirection, out navHit, dist, layermask);
-
-        return navHit.position;
-    }
-
+    
 }

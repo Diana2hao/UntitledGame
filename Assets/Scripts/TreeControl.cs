@@ -89,7 +89,34 @@ public class TreeControl : InteractableController
     // Update is called once per frame
     void Update()
     {
-        //TODO: change tree model according to health
+        //health decrease update is done in farmer's cut tree state
+
+        //if cutted down to certain health, downgrade the model
+        if ((currentHealth <= initialHealth * 2 && curTree == 2) || (currentHealth <= initialHealth && curTree == 1))
+        {
+            //deactivate current tree model
+            treeArray[curTree].SetActive(false);
+
+            //activate the smaller tree model
+            curTree -= 1;
+            treeArray[curTree].SetActive(true);
+
+            //move the health bar to correct height
+            canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
+
+            //glow(); make the new model glow (without increase interacting player count)
+            rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+
+            //set trigger collider size for current model
+            ResizeCollider();
+
+            //if not the biggest tree anymore, inform birds control
+            if (curTree == 1)
+            {
+                isFullyGrown = false;
+                //TODO: add interaction with birds control
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -126,13 +153,15 @@ public class TreeControl : InteractableController
 
     private void waterTree()
     {
-        growCount += 1;
         currentHealth += healthPerWater;
 
-        wBar.SetCurrentValue(currentHealth);
+        //make sure current health does not go over max health
+        if(currentHealth >= maxHealth) {currentHealth = maxHealth;}
 
-        //TODO: redo this part based on health change
-        if (growCount >= 3 && curTree < 2)
+        wBar.SetCurrentValue(currentHealth);
+        
+        //if reaches the next growth stage, upgrade the model
+        if ((currentHealth >= initialHealth * 2 && curTree == 0) || (currentHealth >= maxHealth && curTree == 1))
         {
             //deactivate current tree model
             treeArray[curTree].SetActive(false);
@@ -141,9 +170,8 @@ public class TreeControl : InteractableController
             curTree += 1;
             treeArray[curTree].SetActive(true);
 
-            //move up the health bar
+            //move the health bar
             canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
-            wBar.SetCurrentValue(0);
 
             //glow(); make the new model glow (without increase interacting player count)
             rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
@@ -151,12 +179,11 @@ public class TreeControl : InteractableController
             //set trigger collider size for current model
             ResizeCollider();
 
-            growCount = 0;
-
+            //if at max, inform birds control
             if (curTree == 2)
             {
                 isFullyGrown = true;
-                wBar.gameObject.SetActive(false);
+                //wBar.gameObject.SetActive(false);
                 birdsControl.AddGrownTree(this.gameObject);
             }
         }

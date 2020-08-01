@@ -627,8 +627,8 @@ MonoBehaviour:
   isCutting: 0
   wBar: {fileID: 636393286096375215}
   canvas: {fileID: 984363389}
-  initialHealth: 0
-  waterPerGrowth: 0
+  initialHealth: 30
+  waterPerGrowth: 3
   FinalSize: 4
   birdsControl: {fileID: 1152100205337265593, guid: d4bc0d1a01775134b961ada29d159c2a,
     type: 3}

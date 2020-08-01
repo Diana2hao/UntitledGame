@@ -5,12 +5,12 @@ using UnityEngine.AI;
 
 public class SurfaceGenerator : MonoBehaviour
 {
-    public NavMeshSurface surface;
+    //public NavMeshSurface surface;
 
     // Start is called before the first frame update
     void Start()
     {
-        surface.BuildNavMesh();
+        //surface.BuildNavMesh();
     }
 
     // Update is called once per frame

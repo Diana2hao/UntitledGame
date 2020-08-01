@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class WalkToTargetState : StateMachineBehaviour
+public class FleeState : StateMachineBehaviour
 {
-    public float stopDistanceFromTarget;
+    public float safeDistance;
+
     NavMeshAgent navAgent;
     FarmerAI fAI;
-    GameObject currTarget;
-    float distance;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -19,33 +18,45 @@ public class WalkToTargetState : StateMachineBehaviour
             navAgent = animator.GetComponent<NavMeshAgent>();
         }
 
-        if(fAI == null)
+        if (fAI == null)
         {
             fAI = animator.GetComponent<FarmerAI>();
         }
 
-        //set the navmesh agent target
-        currTarget = fAI.CurrTarget;
-        navAgent.SetDestination(currTarget.transform.position);
-
+        //TODO: set initial flee destination
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        distance = Vector3.Distance(navAgent.transform.position, currTarget.transform.position);
-        if (distance < stopDistanceFromTarget)
+        //TODO: update flee destination
+
+        //check if should stop fleeing
+        CheckIfStopFlee(animator);
+    }
+
+    void CheckIfStopFlee(Animator anim)
+    {
+        //removes each player that is outside safe distance
+        foreach(GameObject player in fAI.FleeFromPlayers)
         {
-            //stop the navmeshagent
-            navAgent.ResetPath();
-            animator.SetInteger("State", (int)Transition.CUTTREE);
+            if (Vector3.Distance(player.transform.position, fAI.transform.position) >= safeDistance)
+            {
+                fAI.FleeFromPlayers.Remove(player);
+            }
+        }
+
+        //if no player is inside safe distance, stop fleeing, enter idle state
+        if(fAI.FleeFromPlayers.Count == 0)
+        {
+            anim.SetInteger("State", (int)Transition.IDLE);
         }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     //{
-    //
+    //    
     //}
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

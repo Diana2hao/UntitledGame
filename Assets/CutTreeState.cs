@@ -5,7 +5,6 @@ using UnityEngine.AI;
 
 public class CutTreeState : StateMachineBehaviour
 {
-    NavMeshAgent navAgent;
     FarmerAI fAI;
     TreeControl currTarget;
 
@@ -15,17 +14,12 @@ public class CutTreeState : StateMachineBehaviour
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (navAgent == null)
-        {
-            navAgent = animator.GetComponent<NavMeshAgent>();
-        }
-
         if (fAI == null)
         {
             fAI = animator.GetComponent<FarmerAI>();
         }
 
-        currTarget = fAI.currTarget.GetComponent<TreeControl>();
+        currTarget = fAI.CurrTarget.GetComponent<TreeControl>();
         timer = 0f;
     }
 
@@ -34,10 +28,22 @@ public class CutTreeState : StateMachineBehaviour
     {
         timer += Time.deltaTime;
 
+        //every cuttime(2 sec), tree loses some health
         if (timer > cutTime)
         {
             timer -= cutTime;
             currTarget.CurrentHealth -= currTarget.HealthPerWater/2;
+            currTarget.wBar.SetCurrentValue(currTarget.CurrentHealth);
+
+            //if health goes below zero, destroy tree
+            if (currTarget.CurrentHealth < 0)
+            {
+                //TODO: destroy tree
+                currTarget.CurrentHealth = 0;
+
+                //TODO: the following actions after this tree got destroyed
+
+            }
         }
     }
 
