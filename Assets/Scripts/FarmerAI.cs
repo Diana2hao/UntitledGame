@@ -8,11 +8,11 @@ public class FarmerAI : MonoBehaviour
     public NavMeshAgent agent;
     public float wanderRadius;
     public float wanderTimer;
+    public GameObject currTarget;
 
     float timer;
     Animator anim;
     //GameObject[] plants;
-    GameObject nearest;
     float minDist;
     TreeListController tl;
 
@@ -47,10 +47,10 @@ public class FarmerAI : MonoBehaviour
 
         }*/
 
-        if(!anim.GetBool("isCutting") && tl.treeList.Count!=0)
+        if(anim.GetInteger("State") == (int)Transition.IDLE && tl.treeList.Count!=0)
         {
             //find the nearest tree that is not targeted
-            nearest = tl.treeList[0];
+            GameObject nearest = tl.treeList[0];
             minDist = -1.0F;
             foreach(GameObject plant in tl.treeList)
             {
@@ -62,9 +62,14 @@ public class FarmerAI : MonoBehaviour
                 }
             }
 
+            currTarget = nearest;
+
+            //set state to walktotarget
+            anim.SetInteger("State", (int)Transition.WALKTOTARGET);
+
             //set walking to true
-            anim.SetBool("isWalking", true);
-            agent.SetDestination(nearest.transform.position);
+            //anim.SetBool("isWalking", true);
+            //agent.SetDestination(nearest.transform.position);
             
 
             //direction = (transform.position - nearest.transform.position) / minDist;

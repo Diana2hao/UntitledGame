@@ -4,39 +4,53 @@ using UnityEngine;
 
 public class TreeControl : InteractableController
 {
+    //3 growth stage models (childs) plus one indicator model
     GameObject Tree0;
     GameObject Tree1;
     GameObject Tree2;
+    GameObject[] treeArray;
+    public GameObject TransparentFinalModel;
+
+    //enemy interaction related
     public bool isTarget;
     public bool isCutting;
-    public GameObject TransparentFinalModel;
-    public int FinalSize;
+
+    //health related
     public WaterBar wBar;
     public Canvas canvas;
-    public BirdsControl birdsControl;
+    public int initialHealth;
+    public int waterPerGrowth;
+    int maxHealth;
+    int healthPerWater;
+    int currentHealth;
 
+    //model change related
+    public int FinalSize;
     int growCount;
     int curTree;
-    GameObject[] treeArray;
-    int[] sizeArray;
-    float[] barHeights;
+    int[] trigColliderSizeArray;
     BoxCollider bc;
+    float[] barHeights;
+    Renderer[] rdArray;
 
+    //player interaction related
     List<GameObject> interactPlayers;
-    bool farmerTrig;
     int playerNum;
     bool isPlanted;
     bool isFullyGrown;
+    public BirdsControl birdsControl;
 
-    Renderer[] rdArray;
 
     public bool IsPlanted { get => isPlanted; set => isPlanted = value; }
     public bool IsFullyGrown { get => isFullyGrown; set => isFullyGrown = value; }
+    public int CurrentHealth { get => currentHealth; set => currentHealth = value; }
+    public int HealthPerWater { get => healthPerWater; set => healthPerWater = value; }
 
 
     // Start is called before the first frame update
     void Start()
     {
+        //set initial values
         growCount = 0;
         curTree = 0;
         interactPlayers = new List<GameObject>();
@@ -47,36 +61,35 @@ public class TreeControl : InteractableController
         Tree0 = transform.GetChild(0).gameObject;
         Tree1 = transform.GetChild(1).gameObject;
         Tree2 = transform.GetChild(2).gameObject;
-
         treeArray = new GameObject[] { Tree0, Tree1, Tree2 };
-        sizeArray = new int[] { 2, 4, 5 };
-        barHeights = new float[] { 1.5f, 2.5f, 4.5f };
-
         Tree0.SetActive(true);
         Tree1.SetActive(false);
         Tree2.SetActive(false);
 
+        //numbers obtained by experimenting in scene
+        trigColliderSizeArray = new int[] { 2, 4, 5 };
+        barHeights = new float[] { 1.5f, 2.5f, 4.5f };
+        
         bc = gameObject.GetComponent<BoxCollider>();
-        buildCollider(sizeArray[0]);
+        ResizeCollider();
 
         Renderer rd0 = Tree0.GetComponent<Renderer>();
         Renderer rd1 = Tree1.GetComponent<Renderer>();
         Renderer rd2 = Tree2.GetComponent<Renderer>();
-
         rdArray = new Renderer[] { rd0, rd1, rd2 };
+
+        //set health related values
+        maxHealth = initialHealth * 3;
+        healthPerWater = initialHealth / waterPerGrowth;
+        currentHealth = initialHealth;
+        wBar.SetMaxValue(maxHealth);
+        wBar.SetCurrentValue(currentHealth);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (interactPlayers.Count > 0)
-        {
-            if(Input.GetKeyDown(KeyCode.X) && curTree < 2)
-            {
-                waterTree();
-            }
-        }
-
+        //TODO: change tree model according to health
     }
 
     private void OnTriggerEnter(Collider other)
@@ -87,7 +100,7 @@ public class TreeControl : InteractableController
         }
         if (other.CompareTag("Farmer"))
         {
-            farmerTrig = true;
+            
         }
     }
 
@@ -99,12 +112,14 @@ public class TreeControl : InteractableController
         }
         if (other.CompareTag("Farmer"))
         {
-            farmerTrig = false;
+            
         }
     }
 
-    private void buildCollider(int size)
+    //set trigger collider size for current model
+    private void ResizeCollider()
     {
+        int size = trigColliderSizeArray[curTree];
         bc.center = new Vector3(0, size/2, 0);
         bc.size = new Vector3(size, size, size);
     }
@@ -112,24 +127,34 @@ public class TreeControl : InteractableController
     private void waterTree()
     {
         growCount += 1;
-        wBar.SetWaterCount(growCount);
+        currentHealth += healthPerWater;
+
+        wBar.SetCurrentValue(currentHealth);
+
+        //TODO: redo this part based on health change
         if (growCount >= 3 && curTree < 2)
         {
+            //deactivate current tree model
             treeArray[curTree].SetActive(false);
 
+            //activate next growth level tree model
             curTree += 1;
             treeArray[curTree].SetActive(true);
-            canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
-            wBar.SetWaterCount(0);
 
-            //glow();
+            //move up the health bar
+            canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
+            wBar.SetCurrentValue(0);
+
+            //glow(); make the new model glow (without increase interacting player count)
             rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
-            buildCollider(sizeArray[curTree]);
+
+            //set trigger collider size for current model
+            ResizeCollider();
+
             growCount = 0;
 
             if (curTree == 2)
             {
-
                 isFullyGrown = true;
                 wBar.gameObject.SetActive(false);
                 birdsControl.AddGrownTree(this.gameObject);

@@ -7,7 +7,12 @@ public class WaterBar : MonoBehaviour
 {
     public Slider slider;
 
-    public void SetWaterCount(int count)
+    public void SetMaxValue(int maxValue)
+    {
+        slider.maxValue = maxValue;
+    }
+
+    public void SetCurrentValue(int count)
     {
         slider.value = count;
     }
