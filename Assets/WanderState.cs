@@ -9,6 +9,7 @@ public class WanderState : StateMachineBehaviour
     public float minWanderDistance = 5;
     public float maxWanderDistance = 15;
     Vector3 target;
+    
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -18,6 +19,7 @@ public class WanderState : StateMachineBehaviour
             navAgent = animator.GetComponent<NavMeshAgent>();
         }
         
+
         //set a random destination to wander to
         SetRandomDestination(navAgent);
     }

@@ -8,16 +8,18 @@ public class FarmerAI : MonoBehaviour
     public float fleeDistance;
 
     GameObject currTarget;
+    bool hasTarget;
     
     Animator anim;
     float minDist;
     TreeListController tl;
 
     GameObject[] allPlayers;
-    List<GameObject> fleeFromPlayers;
+    HashSet<GameObject> fleeFromPlayers;
 
     public GameObject CurrTarget { get => currTarget; set => currTarget = value; }
-    public List<GameObject> FleeFromPlayers { get => fleeFromPlayers; set => fleeFromPlayers = value; }
+    public HashSet<GameObject> FleeFromPlayers { get => fleeFromPlayers; set => fleeFromPlayers = value; }
+    public bool HasTarget { get => hasTarget; set => hasTarget = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -26,13 +28,15 @@ public class FarmerAI : MonoBehaviour
 
         tl = GameObject.FindObjectOfType<TreeListController>();
         allPlayers = GameObject.FindGameObjectsWithTag("Player");
-        fleeFromPlayers = new List<GameObject>();
+        fleeFromPlayers = new HashSet<GameObject>();
+        hasTarget = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(anim.GetInteger("State") == (int)Transition.IDLE && tl.treeList.Count!=0)
+        //find a target (idle state will monitor current target and execute transition)
+        if (!hasTarget && tl.treeList.Count!=0)
         {
             //find the nearest tree that is not targeted
             //TODO: check if tree is already being cut
@@ -49,11 +53,7 @@ public class FarmerAI : MonoBehaviour
             }
 
             currTarget = nearest;
-
-            //set state to walktotarget
-            anim.SetInteger("State", (int)Transition.WALKTOTARGET);
-
-            
+            hasTarget = true;
 
             //set plant status to isTarget
             TreeControl tc = nearest.GetComponent<TreeControl>();
@@ -61,7 +61,7 @@ public class FarmerAI : MonoBehaviour
         }
 
         CheckIfShouldFlee();
-
+        
     }
 
     private void CheckIfShouldFlee()
@@ -70,8 +70,8 @@ public class FarmerAI : MonoBehaviour
         {
             if(Vector3.Distance(player.transform.position, this.transform.position) <= fleeDistance)
             {
-                //set state to flee
-                if(anim.GetInteger("State") != (int)Transition.FLEE) { anim.SetInteger("State", (int)Transition.FLEE); }  //does setting state again calls onenter repeatedly?
+                //remember to uncheck "can transition to self" in editor
+                anim.SetInteger("State", (int)Transition.FLEE);
                 
                 fleeFromPlayers.Add(player);
             }

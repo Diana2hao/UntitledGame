@@ -289,7 +289,6 @@ public class PlayerController : MonoBehaviour
         {
             curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
         }
-
         else if (currentHandheldObject.CompareTag("Plant"))
         {
             //instantiate
