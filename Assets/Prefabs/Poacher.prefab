@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1.5
-  trapPrefab: {fileID: 2164005444428206643, guid: e997014c10cc1734a9ebe9ace8665373,
+  trapPrefab: {fileID: 7556243702232878256, guid: a090573a07874d54e87ef1f2abe92cdb,
     type: 3}
   anim: {fileID: 8022779168719521789}
   WC: {fileID: 7160976308020458807, guid: 853b3ed279ff5474aa8e0781013063ae, type: 3}

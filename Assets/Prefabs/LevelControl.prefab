@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5886200840685511194}
   - component: {fileID: 7160976308020458807}
   m_Layer: 0
-  m_Name: WorldControl
+  m_Name: LevelControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

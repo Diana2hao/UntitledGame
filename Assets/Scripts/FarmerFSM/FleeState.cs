@@ -7,6 +7,7 @@ public class FleeState : StateMachineBehaviour
 {
     public float safeDistance;
     public float fleeDistance;
+    public float speedIncrease;
 
     NavMeshAgent navAgent;
     FarmerAI fAI;
@@ -24,7 +25,9 @@ public class FleeState : StateMachineBehaviour
         {
             fAI = animator.GetComponent<FarmerAI>();
         }
-        
+
+        navAgent.speed += speedIncrease;
+
         FindFleeDestination(animator);
     }
 
@@ -111,6 +114,8 @@ public class FleeState : StateMachineBehaviour
     {
         //after fleeing done, reset target
         fAI.HasTarget = false;
+
+        navAgent.speed -= speedIncrease;
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

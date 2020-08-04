@@ -38,10 +38,11 @@ public class CutTreeState : StateMachineBehaviour
             //if health goes below zero, destroy tree
             if (currTarget.CurrentHealth < 0)
             {
-                //TODO: destroy tree
-                currTarget.CurrentHealth = 0;
+                //destroy tree
+                fAI.DestroyCurrentTarget();
 
-                //TODO: the following actions after this tree got destroyed
+                //after tree destroyed, goes back to idle state
+                animator.SetInteger("State", (int)Transition.IDLE);
 
             }
         }

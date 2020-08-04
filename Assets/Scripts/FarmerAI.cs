@@ -77,5 +77,12 @@ public class FarmerAI : MonoBehaviour
             }
         }
     }
+
+    public void DestroyCurrentTarget()
+    {
+        tl.treeList.Remove(currTarget);
+        hasTarget = false;
+        Destroy(currTarget.gameObject);
+    }
     
 }
