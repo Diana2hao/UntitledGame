@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4520009666934905277}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1787186885706528649}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Hat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6641951532465090205}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,7 +105,8 @@ GameObject:
   - component: {fileID: 3482951064269755544}
   - component: {fileID: 2964121398250359506}
   - component: {fileID: 3077445162635551940}
-  m_Layer: 0
+  - component: {fileID: 4005358592402056480}
+  m_Layer: 10
   m_Name: Hat 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,6 +176,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &4005358592402056480
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6019525060709789663}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 131615843825853041, guid: 3bd12297f673f2f4581398f4e3778e4f, type: 3}
 --- !u!1 &6950943817540804773
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,7 +201,7 @@ GameObject:
   - component: {fileID: 997613228099495357}
   - component: {fileID: 4360305693729340713}
   - component: {fileID: 7533300232677182065}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stick 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -267,8 +282,8 @@ GameObject:
   - component: {fileID: 7176199241204749834}
   - component: {fileID: 7213713602459745809}
   - component: {fileID: 7213713602459745811}
-  m_Layer: 0
-  m_Name: Trap 1
+  m_Layer: 10
+  m_Name: Trap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

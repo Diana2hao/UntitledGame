@@ -43,5 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9689b2a845a350d4db58b153ae087208, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  birdPrefab: {fileID: 6043144583822744936, guid: 62a46f713a4d02e4c8fa1603c2902a35,
+  birdPrefab: {fileID: 8475997403966078931, guid: b36608f157d39ef4785d03dbab03afab,
     type: 3}
+  newDeployTime: 10

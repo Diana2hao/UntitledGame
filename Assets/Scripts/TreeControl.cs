@@ -38,13 +38,17 @@ public class TreeControl : InteractableController
     int playerNum;
     bool isPlanted;
     bool isFullyGrown;
-    public BirdsControl birdsControl;
+    BirdsControl birdsControl;
+
+    //birds related
+    List<Vector3> restSpots;
 
 
     public bool IsPlanted { get => isPlanted; set => isPlanted = value; }
     public bool IsFullyGrown { get => isFullyGrown; set => isFullyGrown = value; }
     public int CurrentHealth { get => currentHealth; set => currentHealth = value; }
     public int HealthPerWater { get => healthPerWater; set => healthPerWater = value; }
+    public List<Vector3> RestSpots { get => restSpots; set => restSpots = value; }
 
 
     // Start is called before the first frame update
@@ -84,12 +88,24 @@ public class TreeControl : InteractableController
         currentHealth = initialHealth;
         wBar.SetMaxValue(maxHealth);
         wBar.SetCurrentValue(currentHealth);
+
+        //get rest spots for birds
+        restSpots = new List<Vector3>();
+        foreach(Transform c in transform.GetChild(4))
+        {
+            restSpots.Add(c.localPosition);
+        }
+
+        //get birds control
+        birdsControl = GameObject.Find("BirdsControl").GetComponent<BirdsControl>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         //health decrease update is done in farmer's cut tree state
+        //if health drop below zero, farmer's cut tree state will destroy tree
 
         //if cutted down to certain health, downgrade the model
         if ((currentHealth <= initialHealth * 2 && curTree == 2) || (currentHealth <= initialHealth && curTree == 1))
@@ -115,6 +131,7 @@ public class TreeControl : InteractableController
             {
                 isFullyGrown = false;
                 //TODO: add interaction with birds control
+                birdsControl.RemoveGrownTree(this);
             }
         }
     }
@@ -184,7 +201,7 @@ public class TreeControl : InteractableController
             {
                 isFullyGrown = true;
                 //wBar.gameObject.SetActive(false);
-                birdsControl.AddGrownTree(this.gameObject);
+                birdsControl.AddGrownTree(this);
             }
         }
         

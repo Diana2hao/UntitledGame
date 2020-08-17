@@ -22,16 +22,16 @@ public class WorldControl : MonoBehaviour
             //send poacher
             foreach(GameObject bird in birds)
             {
-                if (bird.GetComponent<BirdAI>().IsFree)
-                {
-                    Vector3 initP = new Vector3(16f, 0f, bird.transform.position.z);
-                    Vector3 destP = new Vector3(bird.transform.position.x + 3f, 0f, bird.transform.position.z);
-                    GameObject poacher = Instantiate(poacherPrefab, initP, Quaternion.Euler(0, -90, 0));
+                //if (bird.GetComponent<BirdAI>().IsFree)
+                //{
+                //    Vector3 initP = new Vector3(16f, 0f, bird.transform.position.z);
+                //    Vector3 destP = new Vector3(bird.transform.position.x + 3f, 0f, bird.transform.position.z);
+                //    GameObject poacher = Instantiate(poacherPrefab, initP, Quaternion.Euler(0, -90, 0));
 
-                    poacher.GetComponent<PoacherAI>().StartWalking(initP, destP);
+                //    poacher.GetComponent<PoacherAI>().StartWalking(initP, destP);
 
-                    bird.GetComponent<BirdAI>().IsFree = false;
-                }
+                //    bird.GetComponent<BirdAI>().IsFree = false;
+                //}
             }
         }
     }
