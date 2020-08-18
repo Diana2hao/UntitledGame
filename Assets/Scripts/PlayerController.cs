@@ -8,14 +8,19 @@ public class PlayerController : MonoBehaviour
     //public
     public GameObject currentPlant;
     public GroundIndicatorController GroundIndicator;
+    public float dashForce;
+    public ParticleSystem dashEffect;
+    public float pushBackForce;
 
-    //from input
+    //from input, or movement related
     Vector2 inputMovement;
+    bool isDashing = false;
+    bool isPushedBack = false;
+    Vector3 pushedBackDir;
 
     //set numeric value
     float movementSpeed = 5.0F;
     float rotationSpeed = 0.15F;
-    float spawnDistance = 0.8F;
 
     //components
     Animator anim;
@@ -77,6 +82,7 @@ public class PlayerController : MonoBehaviour
         pi = this.GetComponent<PlayerInput>();
     }
 
+    // Update is called once per frame
     void Update()
     {
         UpdateInteraction();
@@ -101,44 +107,43 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        //Planting
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            //pick/put animation?
-
-            //instantiate
-            Vector3 position = transform.position + transform.forward * spawnDistance;
-            GameObject tree = Instantiate(currentPlant, position, Quaternion.Euler(0, 0, 0));
-
-            //add tree to list
-            tl.treeList.Add(tree);
-
-            //remove from boxarea
-
-
-            //regenerate surface
-            //sg.surface.BuildNavMesh();
-        }
-
         if (Input.GetKeyDown(KeyCode.T))
         {
             NextModel();
         }
     }
-    // Update is called once per frame
+
+    
     void FixedUpdate()
     {
         Vector3 direction = new Vector3(inputMovement.x, 0.0F, inputMovement.y);
 
-        if (direction != Vector3.zero)
+        if (isPushedBack)
         {
-            anim.SetBool("isWalking", true);
-            MoveCharacter(direction);
+            rb.AddForce(pushedBackDir.x * pushBackForce, 0, pushedBackDir.z * pushBackForce);
+            isPushedBack = false;
         }
         else
         {
-            anim.SetBool("isWalking", false);
+            if (direction != Vector3.zero)
+            {
+                anim.SetBool("isWalking", true);
+                MoveCharacter(direction);
+
+                if (isDashing)
+                {
+                    rb.AddForce(direction * dashForce);
+                    dashEffect.Play();
+                    isDashing = false;
+                }
+            }
+            else
+            {
+                anim.SetBool("isWalking", false);
+                isDashing = false;
+            }
         }
+        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -154,6 +159,15 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.layer == 10)
         {
             interactableColliders.Remove(other);
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Cactus"))
+        {
+            pushedBackDir = (transform.position - collision.gameObject.transform.position).normalized;
+            isPushedBack = true;
         }
     }
 
@@ -311,7 +325,7 @@ public class PlayerController : MonoBehaviour
 
     void OnDash()
     {
-
+        isDashing = true;
     }
 
     void OnDrop()
