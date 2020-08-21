@@ -18,7 +18,6 @@ public class WanderState : StateMachineBehaviour
         {
             navAgent = animator.GetComponent<NavMeshAgent>();
         }
-        
 
         //set a random destination to wander to
         SetRandomDestination(navAgent);

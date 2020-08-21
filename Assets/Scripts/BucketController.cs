@@ -33,7 +33,7 @@ public class BucketController : InteractableController
         if (!isFilled)
         {
             isFilled = true;
-            rd.materials[1].SetColor("_Color", new Color(0.184f, 0.678f, 0.953f, 0.784f));
+            rd.materials[1].SetColor("_BaseColor", new Color(0.184f, 0.678f, 0.953f, 0.816f));
         }
     }
 
@@ -42,7 +42,7 @@ public class BucketController : InteractableController
         if (isFilled)
         {
             isFilled = false;
-            rd.materials[1].SetColor("_Color", new Color(0.184f, 0.678f, 0.953f, 0.0f));
+            rd.materials[1].SetColor("_BaseColor", new Color(0.184f, 0.678f, 0.953f, 0.0f));
         }
     }
 

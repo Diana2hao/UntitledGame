@@ -75,7 +75,6 @@ public class BirdsControl : MonoBehaviour
         //deploy new bird and reset timer
         DeployBird(gt);
         timer = 0f;
-        Debug.Log(GrownTrees.Count);
     }
 
     public void RemoveGrownTree(TreeControl tc)

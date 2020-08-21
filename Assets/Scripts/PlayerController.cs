@@ -10,13 +10,13 @@ public class PlayerController : MonoBehaviour
     public GroundIndicatorController GroundIndicator;
     public float dashForce;
     public ParticleSystem dashEffect;
-    public float pushBackForce;
+    public float pushBackDistance;
 
     //from input, or movement related
     Vector2 inputMovement;
     bool isDashing = false;
     bool isPushedBack = false;
-    Vector3 pushedBackDir;
+    Vector3 pushedBackDest;
 
     //set numeric value
     float movementSpeed = 5.0F;
@@ -120,8 +120,15 @@ public class PlayerController : MonoBehaviour
 
         if (isPushedBack)
         {
-            rb.AddForce(pushedBackDir.x * pushBackForce, 0, pushedBackDir.z * pushBackForce);
-            isPushedBack = false;
+            if (FlatDistance(transform.position, pushedBackDest) > 0.01f)
+            {
+                float step = movementSpeed * 2f * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(transform.position, pushedBackDest, step);
+            }
+            else
+            {
+                isPushedBack = false;
+            }
         }
         else
         {
@@ -166,7 +173,9 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Cactus"))
         {
-            pushedBackDir = (transform.position - collision.gameObject.transform.position).normalized;
+            Vector3 dir = transform.position - collision.gameObject.transform.position;
+            Vector3 planeDir = new Vector3(dir.x, 0f, dir.z).normalized;
+            pushedBackDest = planeDir * pushBackDistance + transform.position;
             isPushedBack = true;
         }
     }
