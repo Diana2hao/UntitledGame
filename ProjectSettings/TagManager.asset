@@ -9,8 +9,15 @@ TagManager:
   - HelpButton
   - Pickable
   - Bucket
-  - Target
   - Cactus
+  - TargetAnimal
+  - FxTemporaire
+  - Ground
+  - Poop
+  - Vacuum
+  - Station
+  - Poacher
+  - FertilizerBag
   layers:
   - Default
   - TransparentFX
@@ -24,7 +31,7 @@ TagManager:
   - Plant
   - Interactable
   - IndirectInteractable
-  - 
+  - Ground
   - 
   - 
   - 

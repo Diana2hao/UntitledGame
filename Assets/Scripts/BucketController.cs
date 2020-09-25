@@ -63,7 +63,7 @@ public class BucketController : InteractableController
 
     public override void OnPlayerInteract(GameObject player)
     {
-        if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.transform.GetChild(0).GetComponent<BoxCollider>()))
+        if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.transform.GetChild(0).GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity))
         {
             this.GetComponent<Rigidbody>().isKinematic = true;
             this.GetComponent<BoxCollider>().enabled = false;

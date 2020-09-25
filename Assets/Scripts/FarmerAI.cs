@@ -13,6 +13,7 @@ public class FarmerAI : MonoBehaviour
     Animator anim;
     float minDist;
     TreeListController tl;
+    GridController gridCon;
 
     GameObject[] allPlayers;
     HashSet<GameObject> fleeFromPlayers;
@@ -27,6 +28,7 @@ public class FarmerAI : MonoBehaviour
         anim = this.GetComponent<Animator>();
 
         tl = GameObject.FindObjectOfType<TreeListController>();
+        gridCon = GameObject.Find("Grid").GetComponent<GridController>();
         allPlayers = GameObject.FindGameObjectsWithTag("Player");
         fleeFromPlayers = new HashSet<GameObject>();
         hasTarget = false;
@@ -70,10 +72,10 @@ public class FarmerAI : MonoBehaviour
         {
             if(Vector3.Distance(player.transform.position, this.transform.position) <= fleeDistance)
             {
+                fleeFromPlayers.Add(player);
+
                 //remember to uncheck "can transition to self" in editor
                 anim.SetInteger("State", (int)Transition.FLEE);
-                
-                fleeFromPlayers.Add(player);
             }
         }
     }
@@ -81,6 +83,7 @@ public class FarmerAI : MonoBehaviour
     public void DestroyCurrentTarget()
     {
         tl.treeList.Remove(currTarget);
+        gridCon.RemoveGameObjectOfScale(currTarget, currTarget.GetComponent<TreeControl>().FinalSize);
         hasTarget = false;
         Destroy(currTarget.gameObject);
     }

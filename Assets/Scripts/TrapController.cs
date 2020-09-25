@@ -5,25 +5,43 @@ using UnityEngine;
 public class TrapController : MonoBehaviour
 {
     Animator anim;
+    PoacherAI pAI;
+    public ParticleSystem dustEffect;
+    
+    List<GameObject> birdsInTrap;
+
+    public PoacherAI PAI { get => pAI; set => pAI = value; }
+    public List<GameObject> BirdsInTrap { get => birdsInTrap; set => birdsInTrap = value; }
 
     // Start is called before the first frame update
     void Start()
     {
         anim = this.GetComponent<Animator>();
-
+        birdsInTrap = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        if (birdsInTrap.Count >= 4)
         {
-            TriggerTrap();
+            pAI.CanCapture = true;
         }
     }
 
     public void TriggerTrap()
     {
         anim.SetBool("isTriggered", true);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("TargetAnimal"))
+        {
+            if (!birdsInTrap.Contains(other.gameObject))
+            {
+                birdsInTrap.Add(other.gameObject);
+            }
+        }
     }
 }

@@ -8,18 +8,24 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Gtree2
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 1df42aa28d39bb74ba5c639226d48922,
+    type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2050
+  m_CustomRenderQueue: -1
   stringTagMap:
-    RenderType: Opaque
-  disabledShaderPasses: []
+    MotionVector: User
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_A524D199:
+        m_Texture: {fileID: 2800000, guid: 5e96f0ed7ee61bb449ca64e8e3ce33d7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: 5e96f0ed7ee61bb449ca64e8e3ce33d7, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -64,7 +70,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture2D:
+        m_Texture: {fileID: 2800000, guid: 5e96f0ed7ee61bb449ca64e8e3ce33d7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Boolean_DE29413E: 0
+    - Vector1_1F11B5FA: 1
+    - Vector1_21390C9C: 0
+    - Vector1_38E90D44: 0.5
+    - Vector1_73656C02: 0.123
+    - Vector1_7CCE3F2C: 0.35
+    - Vector1_845ADA50: 0.5
+    - Vector1_FD394787: 0.05
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -72,6 +90,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _Emission: 0
+    - _EmissionIntensity: 0.114
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0
@@ -82,6 +102,11 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _RimLightBlend: 0.05
+    - _RimLightSize: 0.5
+    - _RimThreshold: 0.5
+    - _ShadowBlend: 0.123
+    - _ShadowSize: 0
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -91,10 +116,17 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - Color_A282E527: {r: 0, g: 0.03245628, b: 0.1415094, a: 0}
+    - Color_A5FA6E5D: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+    - Color_AA07F86E: {r: 0.81960785, g: 0.81960785, b: 0.81960785, a: 0}
+    - Color_F8F48CFA: {r: 1, g: 1, b: 1, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0.0007314645, g: 0.0007314645, b: 0.0007314645, a: 1}
+    - _RimLightColor: {r: 1, g: 1, b: 1, a: 0}
+    - _ShadowColor: {r: 0, g: 0.03245628, b: 0.1415094, a: 0}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+    - _SpecularColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &4310250512680125573
 MonoBehaviour:

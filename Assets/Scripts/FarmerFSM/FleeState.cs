@@ -77,7 +77,7 @@ public class FleeState : StateMachineBehaviour
     void FindFleeDestination(Animator anim)
     {
         Vector3 center = CenterOfMass();
-        Vector3 intendedPosition = (anim.transform.position - center).normalized * fleeDistance;
+        Vector3 intendedPosition = anim.transform.position + (anim.transform.position - center).normalized * fleeDistance;
 
         NavMeshHit hit;
         if (NavMesh.SamplePosition(intendedPosition, out hit, 20f, 1))

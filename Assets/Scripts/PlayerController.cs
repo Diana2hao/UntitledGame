@@ -11,12 +11,16 @@ public class PlayerController : MonoBehaviour
     public float dashForce;
     public ParticleSystem dashEffect;
     public float pushBackDistance;
+    public float pushForce;
+    public float pushTime;
 
     //from input, or movement related
     Vector2 inputMovement;
     bool isDashing = false;
     bool isPushedBack = false;
     Vector3 pushedBackDest;
+    Vector3 pushedBackDir;
+    float pushBackTimer = 0f;
 
     //set numeric value
     float movementSpeed = 5.0F;
@@ -29,6 +33,7 @@ public class PlayerController : MonoBehaviour
     SurfaceGenerator sg;
     Rigidbody rb;
     public PlayerInput pi;
+    GridController gridCon;
 
     //models
     List<GameObject> playerModels;
@@ -71,6 +76,7 @@ public class PlayerController : MonoBehaviour
         rb = this.GetComponent<Rigidbody>();
         tl = GameObject.FindObjectOfType<TreeListController>();
         sg = GameObject.FindObjectOfType<SurfaceGenerator>();
+        gridCon = GameObject.Find("Grid").GetComponent<GridController>();
 
         interactableColliders = new List<Collider>();
         lastInteractObject = null;
@@ -89,22 +95,24 @@ public class PlayerController : MonoBehaviour
 
         if (currentHandheldObject != null && currentHandheldObject.CompareTag("Plant"))
         {
-            intendedPosition = GroundIndicator.GetPlantPosition(this.transform.position, curObjectSize);
-            if(tPrefab == null)
+            //intendedPosition = GroundIndicator.GetPlantPosition(this.transform.position, curObjectSize);
+            if(gridCon.FindPlantPosition(this.transform.position, this.transform.forward, curObjectSize, out intendedPosition))
             {
-                tPrefab = currentHandheldObject.GetComponent<TreeControl>().TransparentFinalModel;
-            }
+                if (tPrefab == null)
+                {
+                    tPrefab = currentHandheldObject.GetComponent<TreeControl>().TransparentFinalModel;
+                }
 
-            if (transT == null)
-            {
-                transT = Instantiate(tPrefab, intendedPosition + tPrefab.transform.position, Quaternion.Euler(0, 0, 0));
+                if (transT == null)
+                {
+                    transT = Instantiate(tPrefab, intendedPosition + tPrefab.transform.position, Quaternion.Euler(0, 0, 0));
+                }
+                else
+                {
+                    transT.SetActive(true);
+                    transT.transform.position = intendedPosition + tPrefab.transform.position;
+                }
             }
-            else
-            {
-                transT.SetActive(true);
-                transT.transform.position = intendedPosition + tPrefab.transform.position;
-            }
-
         }
 
         if (Input.GetKeyDown(KeyCode.T))
@@ -120,14 +128,26 @@ public class PlayerController : MonoBehaviour
 
         if (isPushedBack)
         {
-            if (FlatDistance(transform.position, pushedBackDest) > 0.01f)
+            //if (FlatDistance(transform.position, pushedBackDest) > 0.01f)
+            //{
+            //    float step = movementSpeed * 2f * Time.deltaTime;
+            //    transform.position = Vector3.MoveTowards(transform.position, pushedBackDest, step);
+            //}
+            //else
+            //{
+            //    isPushedBack = false;
+            //}
+            if(pushBackTimer == 0f)
             {
-                float step = movementSpeed * 2f * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, pushedBackDest, step);
+                rb.AddForce(pushedBackDir * pushForce);
             }
-            else
+            
+            pushBackTimer += Time.deltaTime;
+
+            if (pushBackTimer > pushTime)
             {
                 isPushedBack = false;
+                pushBackTimer = 0f;
             }
         }
         else
@@ -174,8 +194,9 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Cactus"))
         {
             Vector3 dir = transform.position - collision.gameObject.transform.position;
-            Vector3 planeDir = new Vector3(dir.x, 0f, dir.z).normalized;
-            pushedBackDest = planeDir * pushBackDistance + transform.position;
+            Vector3 flatDir = new Vector3(dir.x, 0f, dir.z).normalized;
+            pushedBackDir = flatDir;
+            pushedBackDest = flatDir * pushBackDistance + transform.position;
             isPushedBack = true;
         }
     }
@@ -256,19 +277,22 @@ public class PlayerController : MonoBehaviour
         return dist;
     }
 
-    public bool Hold(GameObject go, Collider colliderToBeRemoved)
+    public bool Hold(GameObject go, Collider colliderToBeRemoved, Vector3 positionOffset, Quaternion rotationOffset)
     {
-        if (CurrentHandheldObject != null)
+        if (currentHandheldObject != null)
         {
             return false;
         }
 
         anim.SetBool("isHoldingObject", true);
-        CurrentHandheldObject = go;
+        currentHandheldObject = go;
         GameObject dest = playerModels[curModel].transform.GetChild(2).gameObject;
-        go.transform.position = dest.transform.position;
-        go.transform.rotation = Quaternion.identity;
+
         go.transform.parent = dest.transform;
+        //go.transform.position = dest.transform.position + positionOffset;
+        go.transform.localPosition = positionOffset;
+        //go.transform.rotation = this.transform.rotation * rotationOffset;
+        go.transform.localRotation = rotationOffset;
 
         if (colliderToBeRemoved != null)
         {
@@ -280,7 +304,7 @@ public class PlayerController : MonoBehaviour
         if (go.CompareTag("Plant"))
         {
             curObjectSize = go.GetComponent<TreeControl>().FinalSize;
-            GroundIndicator.ShowMosaic(true, this.gameObject);
+            gridCon.ShowMosaic(true, this.gameObject);
         }
 
         return true;
@@ -288,7 +312,7 @@ public class PlayerController : MonoBehaviour
 
     public bool Water()
     {
-        if (currentHandheldObject.CompareTag("Bucket"))
+        if (currentHandheldObject != null && currentHandheldObject.CompareTag("Bucket"))
         {
             BucketController bc = currentHandheldObject.GetComponent<BucketController>();
             if (bc.IsFilled)
@@ -308,27 +332,57 @@ public class PlayerController : MonoBehaviour
 
     void OnInteract()
     {
-        if(curInteractObject != null)
+        //if has sth in hand, take actions base on the thing
+        if(currentHandheldObject != null)
+        {
+            if (currentHandheldObject.CompareTag("Plant"))
+            {
+                //plant on ground
+                currentHandheldObject.transform.position = transT.transform.position;
+                currentHandheldObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+                currentHandheldObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                TreeControl tc = currentHandheldObject.GetComponent<TreeControl>();
+                tc.IsPlanted = true;
+                tc.wBar.gameObject.SetActive(true);
+
+                tl.treeList.Add(currentHandheldObject);
+                gridCon.AddGameObjectOfScale(transT.transform.position, currentHandheldObject, curObjectSize);
+
+                OnDrop();
+
+
+                //regenerate surface
+                //sg.surface.BuildNavMesh();
+            }
+            else if (currentHandheldObject.CompareTag("Vacuum"))
+            {
+                if (curInteractObject != null && curInteractObject.CompareTag("Station"))
+                {
+                    //interaction with station
+                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                }
+                else
+                {
+                    //turn vacuum on and off
+                    currentHandheldObject.GetComponent<VacuumController>().VacuumSwitch();
+                }
+            }
+            else if (currentHandheldObject.CompareTag("Bucket"))
+            {
+                if(curInteractObject != null)
+                {
+                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                }
+
+                //TODO(maybe): if no interact object, pour water anyways
+
+            }
+        }
+        //if nothing in hand, interact with the object in environment
+        else if (curInteractObject != null)
         {
             curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
-        }
-        else if (currentHandheldObject.CompareTag("Plant"))
-        {
-            //instantiate
-            currentHandheldObject.transform.position = transT.transform.position;
-            currentHandheldObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-
-            currentHandheldObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-            currentHandheldObject.GetComponent<TreeControl>().IsPlanted = true;
-            currentHandheldObject.GetComponent<TreeControl>().wBar.gameObject.SetActive(true);
-
-            tl.treeList.Add(currentHandheldObject);
-
-            OnDrop();
-
-
-            //regenerate surface
-            //sg.surface.BuildNavMesh();
         }
     }
 
@@ -337,17 +391,17 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
     }
 
-    void OnDrop()
+    public void OnDrop()
     {
-        if (CurrentHandheldObject != null)
+        if (currentHandheldObject != null)
         {
             anim.SetBool("isHoldingObject", false);
-            CurrentHandheldObject.transform.parent = null;
-            CurrentHandheldObject.GetComponent<InteractableController>().OnDrop();
+            currentHandheldObject.transform.parent = null;
+            currentHandheldObject.GetComponent<InteractableController>().OnDrop();
 
-            if (CurrentHandheldObject.CompareTag("Plant"))
+            if (currentHandheldObject.CompareTag("Plant"))
             {
-                GroundIndicator.ShowMosaic(false, this.gameObject);
+                gridCon.ShowMosaic(false, this.gameObject);
                 transT.SetActive(false);
             }
 

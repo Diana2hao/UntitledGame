@@ -59,6 +59,15 @@ public class Grid
         return false;
     }
 
+    public bool isBlocked()
+    {
+        if (this.type == (int)GridType.BLOCKED)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public int GetGridType()
     {
         return this.type;

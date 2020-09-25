@@ -52,8 +52,7 @@ public class PlantDistributorController : InteractableController
 
     public override void OnPlayerInteract(GameObject player)
     {
-        GameObject handheld = player.GetComponent<PlayerController>().CurrentHandheldObject;
-        if (handheld == null && plantReady)
+        if (player.GetComponent<PlayerController>().CurrentHandheldObject == null && plantReady)
         {
             GameObject tree = Instantiate(currentPlant, transform.position, Quaternion.Euler(0, 0, 0));
 
@@ -61,7 +60,7 @@ public class PlantDistributorController : InteractableController
             tree.GetComponent<BoxCollider>().enabled = false;
             tree.transform.GetChild(0).GetComponent<BoxCollider>().enabled = false;
 
-            player.GetComponent<PlayerController>().Hold(tree, this.transform.GetChild(0).GetComponent<BoxCollider>());
+            player.GetComponent<PlayerController>().Hold(tree, this.transform.GetChild(0).GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity);
         }
     }
 

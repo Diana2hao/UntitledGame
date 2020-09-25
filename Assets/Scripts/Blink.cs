@@ -34,7 +34,7 @@ public class Blink : MonoBehaviour
     {
         for(int idx = 0; idx <= 4; idx += 1)
         {
-            eyeMat.SetTexture("_MainTex", eyeTexArray[idx]);
+            eyeMat.SetTexture("_Texture2D", eyeTexArray[idx]);
             yield return new WaitForSeconds(.05f);
         }
     }

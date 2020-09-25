@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//handles player interaction, tree growth, and tree cutting (farmer interaction)
 public class TreeControl : InteractableController
 {
     //3 growth stage models (childs) plus one indicator model
@@ -14,6 +15,7 @@ public class TreeControl : InteractableController
     //enemy interaction related
     public bool isTarget;
     public bool isCutting;
+    GridController gridCon;
 
     //health related
     public WaterBar wBar;
@@ -42,13 +44,15 @@ public class TreeControl : InteractableController
 
     //birds related
     List<Vector3> restSpots;
-
+    List<Quaternion> restRotations;
+    
 
     public bool IsPlanted { get => isPlanted; set => isPlanted = value; }
     public bool IsFullyGrown { get => isFullyGrown; set => isFullyGrown = value; }
     public int CurrentHealth { get => currentHealth; set => currentHealth = value; }
     public int HealthPerWater { get => healthPerWater; set => healthPerWater = value; }
     public List<Vector3> RestSpots { get => restSpots; set => restSpots = value; }
+    public List<Quaternion> RestRotations { get => restRotations; set => restRotations = value; }
 
 
     // Start is called before the first frame update
@@ -71,7 +75,7 @@ public class TreeControl : InteractableController
         Tree2.SetActive(false);
 
         //numbers obtained by experimenting in scene
-        trigColliderSizeArray = new int[] { 2, 4, 5 };
+        trigColliderSizeArray = new int[] { 2, 3, 3 };
         barHeights = new float[] { 1.5f, 2.5f, 4.5f };
         
         bc = gameObject.GetComponent<BoxCollider>();
@@ -91,13 +95,18 @@ public class TreeControl : InteractableController
 
         //get rest spots for birds
         restSpots = new List<Vector3>();
-        foreach(Transform c in transform.GetChild(4))
+        restRotations = new List<Quaternion>();
+        foreach (Transform c in transform.GetChild(4))
         {
             restSpots.Add(c.localPosition);
+            restRotations.Add(c.localRotation);
         }
 
         //get birds control
         birdsControl = GameObject.Find("BirdsControl").GetComponent<BirdsControl>();
+
+        //get grid controller
+        gridCon = GameObject.Find("Grid").GetComponent<GridController>();
 
     }
 
@@ -121,7 +130,8 @@ public class TreeControl : InteractableController
             canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
 
             //glow(); make the new model glow (without increase interacting player count)
-            rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+            rdArray[curTree].material.SetFloat("_Emission", 1);
 
             //set trigger collider size for current model
             ResizeCollider();
@@ -191,7 +201,8 @@ public class TreeControl : InteractableController
             canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
 
             //glow(); make the new model glow (without increase interacting player count)
-            rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+            rdArray[curTree].material.SetFloat("_Emission", 1);
 
             //set trigger collider size for current model
             ResizeCollider();
@@ -210,7 +221,8 @@ public class TreeControl : InteractableController
     public override void glow()
     {
         playerNum += 1;
-        rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+        //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+        rdArray[curTree].material.SetFloat("_Emission", 1);
     }
 
     public override void unglow()
@@ -218,7 +230,8 @@ public class TreeControl : InteractableController
         playerNum -= 1;
         if(playerNum == 0)
         {
-            rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.001f, 0.001f, 0.001f, 1.0f));
+            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.001f, 0.001f, 0.001f, 1.0f));
+            rdArray[curTree].material.SetFloat("_Emission", 0);
         }
     }
 
@@ -226,7 +239,7 @@ public class TreeControl : InteractableController
     {
         if (!isPlanted)
         {
-            if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.GetComponent<BoxCollider>()))
+            if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity))
             {
                 PickUp(true);
             }

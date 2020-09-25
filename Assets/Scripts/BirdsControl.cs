@@ -3,54 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using Random = System.Random;
 using UnityEngine;
+using UnityEngine.AI;
 
+
+//keep track of all fully grown trees, the birds on them, and all traps
 public class BirdsControl : MonoBehaviour
 {
     List<GrownTree> GrownTrees;
     List<GrownTree> OccupiedTrees;
     public GameObject birdPrefab;
+    public NavMeshAgent birdNavAgent;
+    GridController gridCon;
+    List<TrapController> traps;
 
     float timer = 0f;
     public float newDeployTime;
     Random rnd = new Random();
-
-    struct GrownTree
-    {
-        public GameObject tree;
-        public List<Vector3> restPositions;
-        public List<GameObject> birds;
-        public bool[] occupied;
-        public int birdCount;
-        public int maxBird;
-
-        //struct RestSpot
-        //{
-        //    public bool isOccupied;
-        //    public GameObject bird;
-        //    public Vector3 position;
-        //}
-
-        public GrownTree(TreeControl tc)
-        {
-            tree = tc.gameObject;
-            restPositions = tc.RestSpots;
-            birds = new List<GameObject>();
-            occupied = new bool[restPositions.Count];
-            birdCount = 0;
-            maxBird = restPositions.Count;
-        }
-    }
+    float trapAttrackRadius = 4.5f;
+    
 
     // Start is called before the first frame update
     void Start()
     {
         GrownTrees = new List<GrownTree>();
         OccupiedTrees = new List<GrownTree>();
+        traps = new List<TrapController>();
+
+        gridCon = GameObject.Find("Grid").GetComponent<GridController>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //deploying birds
         if (GrownTrees.Count > 0)
         {
             timer += Time.deltaTime;
@@ -64,6 +49,9 @@ public class BirdsControl : MonoBehaviour
                 timer -= newDeployTime;
             }
         }
+
+        //send birds to traps
+
     }
 
     public void AddGrownTree(TreeControl tree)
@@ -79,40 +67,21 @@ public class BirdsControl : MonoBehaviour
 
     public void RemoveGrownTree(TreeControl tc)
     {
-        //remove form either list
-        FindAndRemove(tc.gameObject, GrownTrees);
-        FindAndRemove(tc.gameObject, OccupiedTrees);
-    }
+        //find the tree and remove form either list
+        GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t => t.tree == tc.gameObject);
 
-    void FindAndRemove(GameObject tree, List<GrownTree> gtlist)
-    {
-        //find the tree
-        int idx = -1;
-        for(int i = 0; i < gtlist.Count; i++)
+        //make each bird on that tree fly away
+        GameObject[] tempBirds = new GameObject[gt.birds.Count];
+        gt.birds.CopyTo(tempBirds);
+        foreach (GameObject bird in tempBirds)
         {
-            if(gtlist[i].tree == tree)
-            {
-                idx = i;
-            }
+            gt.RemoveBird(bird);
+            bird.GetComponent<BirdAI>().FlyAway();
         }
 
-        //if found
-        if(idx != -1)
-        {
-            GrownTree gt = gtlist[idx];
-
-            //make each bird on that tree fly away
-            GameObject[] tempBirds = new GameObject[gt.birds.Count];
-            gt.birds.CopyTo(tempBirds);
-            foreach (GameObject bird in tempBirds)
-            {
-                RemoveBirdFrom(bird, gt);
-            }
-
-            //remove the tree
-            gtlist.RemoveAt(idx);
-        }
-        
+        //remove the tree
+        GrownTrees.Remove(gt);
+        OccupiedTrees.Remove(gt);
     }
 
     public void RemoveABird(GameObject bird)
@@ -122,26 +91,16 @@ public class BirdsControl : MonoBehaviour
         //find the tree this bird is on
         GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t=>t.tree==ba.TargetTree);
 
-        RemoveBirdFrom(bird, gt);
+        gt.RemoveBird(bird);
+
+        if (OccupiedTrees.Contains(gt))
+        {
+            OccupiedTrees.Remove(gt);
+            GrownTrees.Add(gt);
+        }
     }
 
-    void RemoveBirdFrom(GameObject bird, GrownTree gt)
-    {
-        BirdAI ba = bird.GetComponent<BirdAI>();
-
-        //find the spot this bird occupies and set it to unoccupied
-        //int idx = gt.restPositions.IndexOf(ba.TargetRestPosition-gt.tree.transform.position);
-        //Debug.Log(idx);
-        gt.occupied[ba.RestPosIdx] = false;
-
-        //remove this bird from this tree's bird list, and decrease the count
-        gt.birds.Remove(bird);
-        gt.birdCount -= 1;
-
-        //TODO: make bird fly away (animation and movement)
-        ba.FlyAway();
-
-    }
+    
 
     void DeployBird(GrownTree tree)
     {
@@ -167,6 +126,7 @@ public class BirdsControl : MonoBehaviour
         //set this bird's target position to the rest spot position, target tree to this tree
         BirdAI ba = bird.GetComponent<BirdAI>();
         ba.TargetRestPosition = tree.tree.transform.position + tree.restPositions[idx];
+        ba.RestRotation = tree.restRotations[idx];
         ba.TargetTree = tree.tree;
         ba.RestPosIdx = idx;
 
@@ -181,5 +141,78 @@ public class BirdsControl : MonoBehaviour
             GrownTrees.Remove(tree);
             OccupiedTrees.Add(tree);
         }
+    }
+
+    //Poacher Interactions--------------------------------------------------------------------------
+    public bool hasOccupiedTrees()
+    {
+        return OccupiedTrees.Count > 0;
+    }
+
+    public bool FindTargetTreeForPoacher(out Vector3 trapPosition, out Vector3 poacherPosition, out Vector3 hidePosition)
+    {
+        //find a random tree that is not targeted by a poacher yet
+        foreach(GrownTree gt in OccupiedTrees.OrderBy(a => rnd.Next()).ToList())
+        {
+            //check if there is empty grids around the tree
+            if (gridCon.FindTrapPosition(gt.tree, gt.scale, out trapPosition, out poacherPosition, out hidePosition))
+            {
+                return true;
+            }
+        }
+
+        trapPosition = poacherPosition = hidePosition = Vector3.zero;
+        return false;
+    }
+
+    public void AddTrap(TrapController trap)
+    {
+        traps.Add(trap);
+        SendBirdsToTrap(trap);
+    }
+
+    public void RemoveTrap(TrapController trap)
+    {
+        traps.Remove(trap);
+    }
+
+    private void SendBirdsToTrap(TrapController trap)
+    {
+        HashSet<GameObject> trees = gridCon.FindTreeNextToTrap(trap);
+        foreach(GameObject go in trees)
+        {
+            GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t => t.tree == go);
+            foreach(GameObject bird in gt.birds)
+            {
+                Vector3 randDest = FindRandomDestination(trap);
+                bird.GetComponent<BirdAI>().AddTrap(trap, randDest);
+            }
+        }
+    }
+
+    private Vector3 FindRandomDestination(TrapController trap)
+    {
+        Vector3 target = Vector3.zero;
+        
+        NavMeshQueryFilter filterBird = new NavMeshQueryFilter();
+        filterBird.areaMask = birdNavAgent.areaMask;
+        filterBird.agentTypeID = birdNavAgent.agentTypeID;
+
+        float radius = UnityEngine.Random.Range(0.8f, 1.5f);
+        float angle = UnityEngine.Random.Range(0f, 360f);
+
+        Vector3 randomPosition = new Vector3(radius * Mathf.Cos(angle), 0, radius * Mathf.Sin(angle));
+        randomPosition += trap.transform.position;
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomPosition, out hit, 0.2f, filterBird))
+        {
+            target = hit.position;
+        }
+        else
+        {
+            Debug.Log("random dest failed");
+        }
+
+        return target;
     }
 }

@@ -20,15 +20,20 @@ public class PoacherHideState : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //TODO: check for birds entering trap, and set new position for capturing birds
-        //PAI.CurrTargetDest = ...;
-        animator.SetInteger("State", (int)PoacherTransition.CAPTURE);
+        //if enought birds entered trap, start capturing
+        if (PAI.CanCapture)
+        {
+            PAI.CurrTargetDest = PAI.RetrieveTrapPosition;
+            PAI.DeCamouflage();
+            animator.SetInteger("State", (int)PoacherTransition.CAPTURE);
+            PAI.CanCapture = false;
+        }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        PAI.DeCamouflage();//if not enough time for effects to show, move to update
+        PAI.TrapCon.TriggerTrap();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

@@ -8,7 +8,11 @@ public class IdleOnTreeState : StateMachineBehaviour
     NavMeshAgent navAgent;
     BirdAI birdAI;
 
-    
+    float waitTime;
+    float timer = 0f;
+
+    float poopTime;
+    float poopTimer = 0f;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -21,14 +25,42 @@ public class IdleOnTreeState : StateMachineBehaviour
         {
             navAgent = animator.GetComponent<NavMeshAgent>();
         }
+
+        waitTime = Random.Range(3f, 6f);
+        poopTime = Random.Range(5f, 10f);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //Search for traps nearby
-
+        //if bird got scared away
+        if (birdAI.IsFlyingAway)
+        {
+            animator.SetInteger("State", (int)BirdTransition.FLY);
+        }
+        else if (birdAI.IsAttractedToTrap)
+        {
+            timer += Time.deltaTime;
+            if (timer > waitTime)
+            {
+                timer = 0f;
+                birdAI.CurrTarget = birdAI.TrapDest;
+                animator.SetInteger("State", (int)BirdTransition.FLY);
+            }
+        }
+        else if (birdAI.CanPoop)
+        {
+            poopTimer += Time.deltaTime;
+            if (poopTimer > poopTime)
+            {
+                birdAI.Poop();
+                poopTimer = 0f;
+                poopTime = Random.Range(5f, 10f);
+            }
+        }
     }
+
+    
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

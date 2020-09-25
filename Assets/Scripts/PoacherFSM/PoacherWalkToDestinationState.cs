@@ -8,6 +8,8 @@ public class PoacherWalkToDestinationState : StateMachineBehaviour
     NavMeshAgent navAgent;
     PoacherAI PAI;
     Vector3 currTargetDest;
+    Vector3 lastPosition = Vector3.zero;
+    float timeStuck = 0f;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -36,6 +38,19 @@ public class PoacherWalkToDestinationState : StateMachineBehaviour
             //stop the navmeshagent
             navAgent.ResetPath();
             animator.SetTrigger("ExitWalking");
+        }
+        else
+        {
+            if (Vector3.Distance(PAI.transform.position, lastPosition) <= 0.01f)
+                timeStuck += Time.deltaTime;
+
+            lastPosition = PAI.transform.position;
+
+            if (timeStuck >= 2f)
+            {
+                navAgent.ResetPath();
+                animator.SetTrigger("ExitWalking");
+            }
         }
     }
 

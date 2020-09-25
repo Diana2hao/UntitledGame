@@ -20,21 +20,21 @@ public class childTriggerController : BucketController
 
     public override void glow()
     {
-        parent.GetComponent<BucketController>().glow();
+        parent.GetComponent<InteractableController>().glow();
     }
 
     public override void unglow()
     {
-        parent.GetComponent<BucketController>().unglow();
+        parent.GetComponent<InteractableController>().unglow();
     }
 
     public override void OnPlayerInteract(GameObject player)
     {
-        parent.GetComponent<BucketController>().OnPlayerInteract(player);
+        parent.GetComponent<InteractableController>().OnPlayerInteract(player);
     }
 
     public override void OnDrop()
     {
-        parent.GetComponent<BucketController>().OnDrop();
+        parent.GetComponent<InteractableController>().OnDrop();
     }
 }

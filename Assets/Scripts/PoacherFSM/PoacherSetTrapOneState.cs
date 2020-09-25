@@ -16,15 +16,17 @@ public class PoacherSetTrapOneState : StateMachineBehaviour
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        //rotate to face trap position
+        Vector3 dir = (PAI.TrapPosition - PAI.transform.position).normalized;
+        PAI.transform.rotation = Quaternion.Slerp(PAI.transform.rotation, Quaternion.LookRotation(new Vector3(dir.x, 0, dir.z)), 0.3f);
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //when poseture ready, instantiate a trap
+        //when posture ready, instantiate a trap
         PAI.SetTrap();
     }
 

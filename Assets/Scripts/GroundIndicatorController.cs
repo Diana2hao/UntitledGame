@@ -111,7 +111,6 @@ public class GroundIndicatorController : MonoBehaviour
                 pr = p;
             }
         }
-
         return pr;
     }
 

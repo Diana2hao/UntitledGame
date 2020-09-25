@@ -5,6 +5,11 @@ using UnityEngine;
 public class GridController : MonoBehaviour
 {
     public FromTO[] BlockedAreas;
+    public GameObject mosaic;
+
+    GridMap gridMap;
+    HashSet<GameObject> players;
+    GameObject mosaicMap;
 
     ////test
     //public GameObject prefabBlock;
@@ -20,12 +25,17 @@ public class GridController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GridMap gridMap = new GridMap(41,20);
+        gridMap = new GridMap(41,20);
 
         foreach(FromTO ft in BlockedAreas)
         {
             gridMap.BlockOutGrids(ft.from, ft.to);
         }
+
+        mosaicMap = gridMap.GenerateMosaicMap(mosaic);
+        mosaicMap.SetActive(false);
+
+        players = new HashSet<GameObject>();
 
         ////test
         //for (int x = 0; x < gridMap.gridArray.GetLength(0); x++)
@@ -49,5 +59,57 @@ public class GridController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void ShowMosaic(bool show, GameObject player)
+    {
+        if (show)
+        {
+            players.Add(player);
+            mosaicMap.SetActive(show);
+        }
+        else
+        {
+            players.Remove(player);
+            if (players.Count == 0)
+            {
+                mosaicMap.SetActive(show);
+            }
+        }
+    }
+
+    public bool isEmptyAtPosition(Vector3 position)
+    {
+        return gridMap.isEmptyAtPosition(position);
+    }
+
+    public Vector3 GetGridCenterOfPosition(Vector3 position, int scale = 1)
+    {
+        return gridMap.GetGridCenterOfPosition(position, scale);
+    }
+
+    public bool FindPlantPosition(Vector3 playerPosition, Vector3 playerForwardDirection, int scale, out Vector3 plantPosition)
+    {
+        return gridMap.FindPlantPosition(playerPosition, playerForwardDirection, scale, out plantPosition);
+    }
+
+    public void AddGameObjectOfScale(Vector3 worldPosition, GameObject go, int scale)
+    {
+        gridMap.AddGameObjectOfScale(worldPosition, go, scale);
+    }
+
+    public void RemoveGameObjectOfScale(GameObject go, int scale)
+    {
+        gridMap.RemoveGameObjectOfScale(go, scale);
+    }
+
+    public bool FindTrapPosition(GameObject tree, int scale, out Vector3 trapPosition, out Vector3 poacherPosition, out Vector3 hidePosition)
+    {
+        return gridMap.FindTrapPosition(tree, scale, out trapPosition, out poacherPosition, out hidePosition);
+    }
+
+    public HashSet<GameObject> FindTreeNextToTrap(TrapController trap)
+    {
+        return gridMap.FindTreeNextToTrap(trap);
     }
 }

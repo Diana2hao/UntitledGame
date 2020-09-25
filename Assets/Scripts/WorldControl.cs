@@ -6,21 +6,23 @@ public class WorldControl : MonoBehaviour
 {
     public GameObject poacherPrefab;
 
-    List<GameObject> birds;
+    List<GameObject> allBirds;
+
+    public List<GameObject> AllBirds { get => allBirds; set => allBirds = value; }
 
     // Start is called before the first frame update
     void Start()
     {
-        birds = new List<GameObject>();
+        allBirds = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (birds.Count > 0)
+        if (allBirds.Count > 0)
         {
             //send poacher
-            foreach(GameObject bird in birds)
+            foreach(GameObject bird in allBirds)
             {
                 //if (bird.GetComponent<BirdAI>().IsFree)
                 //{
@@ -38,6 +40,6 @@ public class WorldControl : MonoBehaviour
 
     public void AddBird(GameObject bird)
     {
-        birds.Add(bird);
+        allBirds.Add(bird);
     }
 }

@@ -10,6 +10,7 @@ public class Spiral : MonoBehaviour
 
     public float radius;
     public float frequency;
+    public float angleOffset;
 
 
     // Start is called before the first frame update
@@ -20,10 +21,10 @@ public class Spiral : MonoBehaviour
         float i = 0f;
         while(i <= (endCamera - startTree).y)
         {
-            Vector3 p = new Vector3(i*(radius*Mathf.Cos(frequency*i)+unitDir.x/unitDir.y), i, i*(radius*Mathf.Sin(frequency*i) + unitDir.z / unitDir.y)) + startTree;
+            Vector3 p = new Vector3(i*(radius*Mathf.Cos(frequency*i + angleOffset)+unitDir.x/unitDir.y), i, i*(radius*Mathf.Sin(frequency*i + angleOffset) + unitDir.z / unitDir.y)) + startTree;
 
             GameObject aPoint = Instantiate(point, p, Quaternion.Euler(0, 0, 0));
-            i+=0.5f;
+            i+=0.2f;
         }
 
     }
