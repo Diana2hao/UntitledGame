@@ -38,7 +38,7 @@ public class PlantDistributorController : InteractableController
     public override void glow()
     {
         playerNum += 1;
-        rd.material.SetColor("_EmissionColor", new Color(0.067f, 0.515f, 1.0f, 1.0f));
+        rd.materials[0].EnableKeyword("_EMISSION");
     }
 
     public override void unglow()
@@ -46,7 +46,7 @@ public class PlantDistributorController : InteractableController
         playerNum -= 1;
         if (playerNum == 0)
         {
-            rd.material.SetColor("_EmissionColor", new Color(0.001f, 0.001f, 0.001f, 1.0f));
+            rd.materials[0].DisableKeyword("_EMISSION");
         }
     }
 

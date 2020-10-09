@@ -9,7 +9,7 @@ public class CutTreeState : StateMachineBehaviour
     TreeControl currTarget;
 
     float timer;
-    float cutTime = 2f;
+    float cutTime = 1f;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -21,6 +21,9 @@ public class CutTreeState : StateMachineBehaviour
 
         currTarget = fAI.CurrTarget.GetComponent<TreeControl>();
         timer = 0f;
+
+        currTarget.StartCutting();
+        currTarget.CurrentHealth -= 1;  //subtract 1 health immediately after cutting started to avoid delay related situations
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -32,11 +35,11 @@ public class CutTreeState : StateMachineBehaviour
         if (timer > cutTime)
         {
             timer -= cutTime;
-            currTarget.CurrentHealth -= currTarget.HealthPerWater/2;
-            currTarget.wBar.SetCurrentValue(currTarget.CurrentHealth);
+            currTarget.CurrentHealth -= currTarget.maxHealth/10;
+            currTarget.healthBar.SetFillAmount(((float)currTarget.CurrentHealth) / currTarget.maxHealth);
 
-            //if health goes below zero, destroy tree
-            if (currTarget.CurrentHealth < 0)
+            //if health goes below zero and tree already at smallest model, destroy tree
+            if (currTarget.CurrentHealth <= 0 && currTarget.CurTree ==0)
             {
                 //destroy tree
                 fAI.DestroyCurrentTarget();
@@ -49,10 +52,10 @@ public class CutTreeState : StateMachineBehaviour
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        currTarget.StopCutting();
+    }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()
     //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

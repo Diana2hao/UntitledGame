@@ -15,12 +15,15 @@ public class PoopSplatter : MonoBehaviour
     Color transDiff = new Color(0f, 0f, 0f, 0.05f);
 
     BirdAI bAI;
+    bool canBeDestroyed = false;
     VacuumController vc;
     bool hasVacuum;
     bool vacuumStarted = false;
 
     public BirdAI BAI { get => bAI; set => bAI = value; }
     public int PoopCount { get => poopCount; set => poopCount = value; }
+    public bool IsVacuuming { get => isVacuuming; set => isVacuuming = value; }
+    public bool CanBeDestroyed { get => canBeDestroyed; set => canBeDestroyed = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +46,7 @@ public class PoopSplatter : MonoBehaviour
     public void StartVacuum()
     {
         isVacuuming = true;
+        bAI.CanPoop = false;
         if (!vacuumStarted)
         {
             StartCoroutine("Vacuum");
@@ -53,6 +57,12 @@ public class PoopSplatter : MonoBehaviour
     public void StopVacuum()
     {
         isVacuuming = false;
+        bAI.CanPoop = true;
+    }
+
+    public void AddBird(GameObject bird)
+    {
+        this.bAI = bird.GetComponent<BirdAI>();
     }
 
     public void AddPoop()
@@ -99,9 +109,16 @@ public class PoopSplatter : MonoBehaviour
                 {
                     isVacuuming = false;
                     poopCount = 0;
-                    bAI.CanPoop = true;
-                    //vacuum stop filling
                     vc.IsOnPoop = false;
+
+                    if (canBeDestroyed)
+                    {
+                        Destroy(this.gameObject);
+                    }
+                    else
+                    {
+                        bAI.CanPoop = true;
+                    }
                 }
             }
             else
@@ -110,7 +127,6 @@ public class PoopSplatter : MonoBehaviour
                 poopCount -= 5;
                 if (poopCount % 100 == 0)
                 {
-                    Debug.Log(poopCount);
                     poopMat.SetTexture("_BaseMap", poopTexArray[poopCount / 100 - 1]);
                     poopMat.SetColor("_BaseColor", new Color(1f, 1f, 1f, 1f));
                 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BucketController : InteractableController
 {
+    public ParticleSystem splashEffect;
+
     Renderer rd;
     int playerNum;
     GameObject childBucket;
@@ -42,6 +44,7 @@ public class BucketController : InteractableController
         if (isFilled)
         {
             isFilled = false;
+            splashEffect.Play();
             rd.materials[1].SetColor("_BaseColor", new Color(0.184f, 0.678f, 0.953f, 0.0f));
         }
     }
@@ -76,5 +79,22 @@ public class BucketController : InteractableController
         this.GetComponent<Rigidbody>().isKinematic = false;
         this.GetComponent<BoxCollider>().enabled = true;
         this.transform.GetChild(0).GetComponent<BoxCollider>().enabled = true;
+    }
+
+
+    public override bool OnThrow(float throwForce)
+    {
+        if (!IsFilled)
+        {
+            Rigidbody rb = this.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            this.GetComponent<BoxCollider>().enabled = true;
+            this.transform.GetChild(0).GetComponent<BoxCollider>().enabled = true;
+            rb.AddForce(this.transform.parent.forward * throwForce);
+
+            return true;
+        }
+
+        return false;
     }
 }

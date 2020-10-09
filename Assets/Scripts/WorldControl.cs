@@ -5,41 +5,49 @@ using UnityEngine;
 public class WorldControl : MonoBehaviour
 {
     public GameObject poacherPrefab;
+    public GameObject farmerPrefab;
+    public RaftController raft;
 
-    List<GameObject> allBirds;
+    int birdIncrement = 0;
+    int treeIncrement = 0;
 
-    public List<GameObject> AllBirds { get => allBirds; set => allBirds = value; }
+    int birdsPerPoacher;
+    int treesPerFarmer;
 
     // Start is called before the first frame update
     void Start()
     {
-        allBirds = new List<GameObject>();
+        birdsPerPoacher = 4;
+        treesPerFarmer = 2;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (allBirds.Count > 0)
+        if(birdIncrement >= birdsPerPoacher)
         {
-            //send poacher
-            foreach(GameObject bird in allBirds)
-            {
-                //if (bird.GetComponent<BirdAI>().IsFree)
-                //{
-                //    Vector3 initP = new Vector3(16f, 0f, bird.transform.position.z);
-                //    Vector3 destP = new Vector3(bird.transform.position.x + 3f, 0f, bird.transform.position.z);
-                //    GameObject poacher = Instantiate(poacherPrefab, initP, Quaternion.Euler(0, -90, 0));
+            //deploy a poacher to the next raft
+            raft.AddPoacher();
+            birdIncrement = 0;
+            birdsPerPoacher = Random.Range(4, 9);
+        }
 
-                //    poacher.GetComponent<PoacherAI>().StartWalking(initP, destP);
-
-                //    bird.GetComponent<BirdAI>().IsFree = false;
-                //}
-            }
+        if(treeIncrement >= treesPerFarmer)
+        {
+            //deploy a farmer to the next raft
+            raft.AddFarmer();
+            treeIncrement = 0;
+            treesPerFarmer = Random.Range(2, 5);
         }
     }
 
-    public void AddBird(GameObject bird)
+    public void AddBird()
     {
-        allBirds.Add(bird);
+        birdIncrement += 1;
+    }
+
+    public void AddTree()
+    {
+        treeIncrement += 1;
     }
 }

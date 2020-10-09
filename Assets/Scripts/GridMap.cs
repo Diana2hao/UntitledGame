@@ -114,6 +114,12 @@ public class GridMap
         }
     }
 
+    public void BlockOutGrids(Vector3 gridPos)
+    {
+        GetXZ(gridPos, out int x, out int z);
+        gridArray[x, z].SetGridType((int)GridType.BLOCKED);
+    }
+
     //for each grid that is not blocked, generate a mosaic map for player to see
     public GameObject GenerateMosaicMap(GameObject mosaic)
     {

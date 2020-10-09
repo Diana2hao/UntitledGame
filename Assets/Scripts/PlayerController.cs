@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
     public float pushBackDistance;
     public float pushForce;
     public float pushTime;
+    public float throwForce;
+    public AudioSource dashSound;
+    public AudioSource throwSound;
+    public AudioSource waterSound;
 
     //from input, or movement related
     Vector2 inputMovement;
@@ -34,6 +38,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody rb;
     public PlayerInput pi;
     GridController gridCon;
+    GameObject LC;
 
     //models
     List<GameObject> playerModels;
@@ -86,6 +91,7 @@ public class PlayerController : MonoBehaviour
         HasPlant = true;
 
         pi = this.GetComponent<PlayerInput>();
+        LC = GameObject.FindGameObjectWithTag("LevelControl");
     }
 
     // Update is called once per frame
@@ -160,7 +166,8 @@ public class PlayerController : MonoBehaviour
                 if (isDashing)
                 {
                     rb.AddForce(direction * dashForce);
-                    dashEffect.Play();
+                    dashEffect.Play(false);
+                    dashSound.Play();
                     isDashing = false;
                 }
             }
@@ -318,8 +325,22 @@ public class PlayerController : MonoBehaviour
             if (bc.IsFilled)
             {
                 bc.EmptyWater();
+                waterSound.Play();
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public bool Fertilize()
+    {
+        if(currentHandheldObject != null && currentHandheldObject.CompareTag("FertilizerBag"))
+        {
+            FertilizerBagController bag = currentHandheldObject.GetComponent<FertilizerBagController>();
+            OnDrop();
+            bag.DestroyThisBag();
+            return true;
         }
 
         return false;
@@ -344,13 +365,13 @@ public class PlayerController : MonoBehaviour
                 currentHandheldObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
                 TreeControl tc = currentHandheldObject.GetComponent<TreeControl>();
                 tc.IsPlanted = true;
-                tc.wBar.gameObject.SetActive(true);
+                tc.waterBar.gameObject.SetActive(true);
 
                 tl.treeList.Add(currentHandheldObject);
                 gridCon.AddGameObjectOfScale(transT.transform.position, currentHandheldObject, curObjectSize);
 
                 OnDrop();
-
+                LC.GetComponent<WorldControl>().AddTree();
 
                 //regenerate surface
                 //sg.surface.BuildNavMesh();
@@ -377,6 +398,13 @@ public class PlayerController : MonoBehaviour
 
                 //TODO(maybe): if no interact object, pour water anyways
 
+            }
+            else if (currentHandheldObject.CompareTag("FertilizerBag"))
+            {
+                if (curInteractObject != null)
+                {
+                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                }
             }
         }
         //if nothing in hand, interact with the object in environment
@@ -406,6 +434,27 @@ public class PlayerController : MonoBehaviour
             }
 
             currentHandheldObject = null;
+        }
+    }
+
+    public void OnThrow()
+    {
+        if (currentHandheldObject != null)
+        {
+            if (currentHandheldObject.GetComponent<InteractableController>().OnThrow(throwForce))
+            {
+                throwSound.Play();
+                anim.SetBool("isHoldingObject", false);
+                currentHandheldObject.transform.parent = null;
+
+                if (currentHandheldObject.CompareTag("Plant"))
+                {
+                    gridCon.ShowMosaic(false, this.gameObject);
+                    transT.SetActive(false);
+                }
+
+                currentHandheldObject = null;
+            }
         }
     }
 

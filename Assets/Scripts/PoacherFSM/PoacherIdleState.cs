@@ -28,6 +28,13 @@ public class PoacherIdleState : StateMachineBehaviour
             PAI = animator.GetComponent<PoacherAI>();
         }
 
+        if (navAgent == null)
+        {
+            navAgent = animator.GetComponent<NavMeshAgent>();
+        }
+
+        navAgent.enabled = true;
+
         timer = 0f;
     }
 

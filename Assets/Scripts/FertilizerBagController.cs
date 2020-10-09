@@ -27,6 +27,12 @@ public class FertilizerBagController : InteractableController
         DeactivateRigidbody();
     }
 
+    public void DestroyThisBag()
+    {
+        //TODO: add fertilizing effect
+        Destroy(this.gameObject);
+    }
+
     public override void glow()
     {
         playerNum += 1;
@@ -53,6 +59,14 @@ public class FertilizerBagController : InteractableController
     public override void OnDrop()
     {
         DeactivateRigidbody(true);
+    }
+
+    public override bool OnThrow(float throwForce)
+    {
+        DeactivateRigidbody(true);
+        this.GetComponent<Rigidbody>().AddForce(this.transform.parent.forward * throwForce);
+
+        return true;
     }
 
     private void DeactivateRigidbody(bool isInverse = false)

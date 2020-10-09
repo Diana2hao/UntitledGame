@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2644024846749738867}
   - component: {fileID: 2014701506}
   - component: {fileID: 17017385592111535}
+  - component: {fileID: 7313419290588599332}
   m_Layer: 0
   m_Name: NavMesh
   m_TagString: Untagged
@@ -41,7 +42,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1818290423127291025}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
@@ -62,7 +63,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 5895b921ec9bc9042b95992c8bc76d4d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: ff7eb00e26d1ff5438145306ef301f2c, type: 2}
 --- !u!114 &2644024846749738867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,8 +88,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35e95dc5ff2b64380880dd7ac5922847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Size: {x: 41.082157, y: 3.6855183, z: 2.794712}
-  m_Center: {x: 0, y: 1.6627593, z: -8.18}
+  m_Size: {x: 41.73, y: 2.1, z: 3.19}
+  m_Center: {x: 20.5, y: -1.6, z: 1.25}
   m_Area: 1
   m_AffectedAgents: ffffffff
 --- !u!114 &17017385592111535
@@ -119,4 +120,20 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.05666667
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 6d291b66d5c83d74ca07efc99c5e8312, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: b02bc6dd04e7cce4d867fe9d95d9cac8, type: 2}
+--- !u!114 &7313419290588599332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818290423127291025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35e95dc5ff2b64380880dd7ac5922847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Size: {x: 44.708298, y: 6.756693, z: 13.246132}
+  m_Center: {x: 20.354149, y: 3.3317404, z: 24.622608}
+  m_Area: 1
+  m_AffectedAgents: ffffffff

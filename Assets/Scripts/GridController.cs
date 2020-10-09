@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
+    public Vector2Int GridSize;
     public FromTO[] BlockedAreas;
+    public Vector3[] BlockedGrids;
     public GameObject mosaic;
 
     GridMap gridMap;
@@ -25,11 +27,16 @@ public class GridController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gridMap = new GridMap(41,20);
+        gridMap = new GridMap(GridSize.x, GridSize.y);
 
         foreach(FromTO ft in BlockedAreas)
         {
             gridMap.BlockOutGrids(ft.from, ft.to);
+        }
+
+        foreach (Vector3 g in BlockedGrids)
+        {
+            gridMap.BlockOutGrids(g);
         }
 
         mosaicMap = gridMap.GenerateMosaicMap(mosaic);

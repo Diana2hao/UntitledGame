@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+enum LastActiveBar
+{
+    WATERBAR,
+    GROWBAR,
+    NONE
+}
+
 //handles player interaction, tree growth, and tree cutting (farmer interaction)
 public class TreeControl : InteractableController
 {
@@ -18,13 +25,18 @@ public class TreeControl : InteractableController
     GridController gridCon;
 
     //health related
-    public WaterBar wBar;
+    public AudioSource speedUpSound;
+    public AudioSource healSound;
+    public ParticleSystem speedUpEffect;
     public Canvas canvas;
-    public int initialHealth;
+    public TreeHealthBar healthBar;
+    public TreeWaterBar waterBar;
+    public TreeGrowingBar growBar;
+    public int maxHealth;
     public int waterPerGrowth;
-    int maxHealth;
-    int healthPerWater;
     int currentHealth;
+    bool isGrowing;
+    int lastActiveBar;
 
     //model change related
     public int FinalSize;
@@ -50,9 +62,9 @@ public class TreeControl : InteractableController
     public bool IsPlanted { get => isPlanted; set => isPlanted = value; }
     public bool IsFullyGrown { get => isFullyGrown; set => isFullyGrown = value; }
     public int CurrentHealth { get => currentHealth; set => currentHealth = value; }
-    public int HealthPerWater { get => healthPerWater; set => healthPerWater = value; }
     public List<Vector3> RestSpots { get => restSpots; set => restSpots = value; }
     public List<Quaternion> RestRotations { get => restRotations; set => restRotations = value; }
+    public int CurTree { get => curTree; set => curTree = value; }
 
 
     // Start is called before the first frame update
@@ -87,11 +99,7 @@ public class TreeControl : InteractableController
         rdArray = new Renderer[] { rd0, rd1, rd2 };
 
         //set health related values
-        maxHealth = initialHealth * 3;
-        healthPerWater = initialHealth / waterPerGrowth;
-        currentHealth = initialHealth;
-        wBar.SetMaxValue(maxHealth);
-        wBar.SetCurrentValue(currentHealth);
+        currentHealth = maxHealth;
 
         //get rest spots for birds
         restSpots = new List<Vector3>();
@@ -117,7 +125,7 @@ public class TreeControl : InteractableController
         //if health drop below zero, farmer's cut tree state will destroy tree
 
         //if cutted down to certain health, downgrade the model
-        if ((currentHealth <= initialHealth * 2 && curTree == 2) || (currentHealth <= initialHealth && curTree == 1))
+        if (currentHealth <= 0)
         {
             //deactivate current tree model
             treeArray[curTree].SetActive(false);
@@ -143,7 +151,51 @@ public class TreeControl : InteractableController
                 //TODO: add interaction with birds control
                 birdsControl.RemoveGrownTree(this);
             }
+
+            //set health back to max, reset other 2 bar
+            currentHealth = maxHealth;
+            healthBar.SetFillAmount(currentHealth/maxHealth);
+            ResetWaterGrowBar();
+            lastActiveBar = (int)LastActiveBar.NONE;
         }
+        
+    }
+
+    public void StartCutting()
+    {
+        isCutting = true;
+        isGrowing = false;
+        healthBar.gameObject.SetActive(true);
+
+        if (waterBar.gameObject.activeSelf)
+        {
+            lastActiveBar = (int)LastActiveBar.WATERBAR;
+            waterBar.gameObject.SetActive(false);
+        }
+        else if (growBar.gameObject.activeSelf)
+        {
+            lastActiveBar = (int)LastActiveBar.GROWBAR;
+            growBar.StopGrowing();
+            growBar.gameObject.SetActive(false);
+        }
+        else
+        {
+            lastActiveBar = (int)LastActiveBar.NONE;
+        }
+    }
+
+    public void StopCutting()
+    {
+        isCutting = false;
+        //TODO: show an icon to tell player to fix this tree with a bag of fertilizer
+
+    }
+
+    private void ResetWaterGrowBar()
+    {
+        //TODO: not implemented
+        waterBar.ResetBar();
+        growBar.ResetBar();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -180,42 +232,79 @@ public class TreeControl : InteractableController
 
     private void waterTree()
     {
-        currentHealth += healthPerWater;
-
-        //make sure current health does not go over max health
-        if(currentHealth >= maxHealth) {currentHealth = maxHealth;}
-
-        wBar.SetCurrentValue(currentHealth);
-        
-        //if reaches the next growth stage, upgrade the model
-        if ((currentHealth >= initialHealth * 2 && curTree == 0) || (currentHealth >= maxHealth && curTree == 1))
+        //add to water bar, if return value is true, tree can grow to next stage
+        if (waterBar.WaterOnce())
         {
-            //deactivate current tree model
-            treeArray[curTree].SetActive(false);
-
-            //activate next growth level tree model
-            curTree += 1;
-            treeArray[curTree].SetActive(true);
-
-            //move the health bar
-            canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
-
-            //glow(); make the new model glow (without increase interacting player count)
-            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
-            rdArray[curTree].material.SetFloat("_Emission", 1);
-
-            //set trigger collider size for current model
-            ResizeCollider();
-
-            //if at max, inform birds control
-            if (curTree == 2)
-            {
-                isFullyGrown = true;
-                //wBar.gameObject.SetActive(false);
-                birdsControl.AddGrownTree(this);
-            }
+            isGrowing = true;
+            //start change bar coroutine
+            StartCoroutine("ChangeFromWaterToGrowBar");
         }
-        
+    }
+
+    IEnumerator ChangeFromWaterToGrowBar()
+    {
+        // fade out water bar
+
+        waterBar.gameObject.SetActive(false);
+        waterBar.ResetBar();
+
+        // fade in grow bar
+
+        growBar.gameObject.SetActive(true);
+        growBar.StartGrowing();
+
+        yield return null;
+    }
+
+    IEnumerator ChangeFromGrowToWaterBar()
+    {
+        // fade out grow bar
+
+        growBar.gameObject.SetActive(false);
+        growBar.ResetBar();
+
+        // fade in water bar
+        waterBar.gameObject.SetActive(true);
+
+        yield return null;
+    }
+
+    public void GrowUpOneStage()
+    {
+        isGrowing = false;
+
+        //deactivate current tree model
+        treeArray[curTree].SetActive(false);
+
+        //activate next growth level tree model
+        curTree += 1;
+        treeArray[curTree].SetActive(true);
+
+        //move the health bar
+        canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
+
+        //glow(); make the new model glow (without increase interacting player count)
+        //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
+        rdArray[curTree].material.SetFloat("_Emission", 1);
+
+        //set trigger collider size for current model
+        ResizeCollider();
+
+        //if at max, inform birds control
+        if (curTree == 2)
+        {
+            isFullyGrown = true;
+            //wBar.gameObject.SetActive(false);
+            birdsControl.AddGrownTree(this);
+
+            //reset grow bar
+            growBar.gameObject.SetActive(false);
+            growBar.ResetBar();
+        }
+        else
+        {
+            StartCoroutine("ChangeFromGrowToWaterBar");
+        }
     }
 
     public override void glow()
@@ -237,26 +326,80 @@ public class TreeControl : InteractableController
 
     public override void OnPlayerInteract(GameObject player)
     {
+        PlayerController pc = player.GetComponent<PlayerController>();
         if (!isPlanted)
         {
-            if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity))
+            if(pc.Hold(this.gameObject, this.GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity))
             {
                 PickUp(true);
             }
         }
         else
         {
-            if (player.GetComponent<PlayerController>().Water())
+            if (!isGrowing && !isDamaged() && !isFullyGrown && pc.Water())
             {
                 waterTree();
+            }
+
+            else if(isGrowing && growBar.GetBagCount() < 3 && pc.Fertilize())
+            {
+                growBar.AddOneBagOfFert();
+                speedUpSound.Play();
+                speedUpEffect.Play();
+            }
+
+            else if(isDamaged() && pc.Fertilize())
+            {
+                healSound.Play();
+                StartCoroutine("FixTree");
             }
         }
 
     }
 
+    IEnumerator FixTree()
+    {
+        currentHealth = maxHealth;
+        healthBar.SetFillAmount(currentHealth/maxHealth);
+
+        yield return new WaitForSeconds(1f);
+
+        healthBar.gameObject.SetActive(false);
+
+        //set which bar back to active
+        if (lastActiveBar == (int)LastActiveBar.WATERBAR || lastActiveBar == (int)LastActiveBar.NONE)
+        {
+            waterBar.gameObject.SetActive(true);
+        }
+        else
+        {
+            growBar.gameObject.SetActive(false);
+        }
+
+        yield return null;
+    }
+
+    private bool isDamaged()
+    {
+        if (currentHealth < maxHealth)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public override void OnDrop()
     {
         PickUp(false);
+    }
+
+    public override bool OnThrow(float throwForce)
+    {
+        PickUp(false);
+        this.GetComponent<Rigidbody>().AddForce(this.transform.parent.forward * throwForce);
+
+        return true;
     }
 
     private void PickUp(bool up)

@@ -8,16 +8,16 @@ public class VacuumHead : MonoBehaviour
     public VacuumController vacuumControl;
     public BoxCollider box;
 
-    List<PoopSplatter> poopSplatters;
+    List<GameObject> poopSplatters;
     Vector3 headPosition;
 
-    PoopSplatter lastPoop;
-    PoopSplatter currPoop;
+    GameObject lastPoop;
+    GameObject currPoop;
 
     // Start is called before the first frame update
     void Start()
     {
-        poopSplatters = new List<PoopSplatter>();
+        poopSplatters = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -28,7 +28,7 @@ public class VacuumHead : MonoBehaviour
         {
             headPosition = transform.TransformPoint(box.center);
             List<float> distances = new List<float>();
-            foreach (PoopSplatter poop in poopSplatters)
+            foreach (GameObject poop in poopSplatters)
             {
                 float distance = Vector3.Distance(poop.transform.position, headPosition);
                 distances.Add(distance);
@@ -36,16 +36,14 @@ public class VacuumHead : MonoBehaviour
             int index = distances.IndexOf(distances.Min());
             lastPoop = currPoop;
             currPoop = poopSplatters[index];
-            if(lastPoop != currPoop)
+            if(lastPoop != currPoop || !vacuumControl.IsOnPoop)
             {
-                vacuumControl.IsOnPoop = (currPoop.PoopCount > 0);
+                vacuumControl.IsOnPoop = (currPoop.GetComponent<PoopSplatter>().PoopCount > 0);
                 vacuumControl.SwitchPoop(currPoop);
             }
         }
         else
         {
-            lastPoop = currPoop;
-            currPoop = null;
             vacuumControl.IsOnPoop = false;
         }
     }
@@ -54,7 +52,7 @@ public class VacuumHead : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Poop"))
         {
-            poopSplatters.Add(other.GetComponent<PoopSplatter>());
+            poopSplatters.Add(other.gameObject);
         }
     }
 
@@ -62,7 +60,7 @@ public class VacuumHead : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Poop"))
         {
-            poopSplatters.Remove(other.GetComponent<PoopSplatter>());
+            poopSplatters.Remove(other.gameObject);
         }
     }
 }

@@ -6,6 +6,11 @@ using UnityEngine.AI;
 public class FarmerAI : MonoBehaviour
 {
     public float fleeDistance;
+    public Vector2 entryPointRange;
+    public float entryPointZ;
+
+    bool enteredLevel = false;
+    float entryPoint;
 
     GameObject currTarget;
     bool hasTarget;
@@ -32,11 +37,26 @@ public class FarmerAI : MonoBehaviour
         allPlayers = GameObject.FindGameObjectsWithTag("Player");
         fleeFromPlayers = new HashSet<GameObject>();
         hasTarget = false;
+
+        entryPoint = Random.Range(entryPointRange.x, entryPointRange.y);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!enteredLevel)
+        {
+            if (transform.position.x > entryPoint)
+            {
+                Debug.Log("condition met");
+                this.transform.parent = null;
+                this.GetComponent<Animator>().SetBool("EnterLevel", true);
+                this.transform.position = new Vector3(transform.position.x, transform.position.y, entryPointZ);
+                this.transform.rotation = Quaternion.identity;
+                enteredLevel = true;
+            }
+        }
+
         //find a target (idle state will monitor current target and execute transition)
         if (!hasTarget && tl.treeList.Count!=0)
         {

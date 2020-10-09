@@ -43,5 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 909e4e017a02e1b49b39c45075e9e49a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poacherPrefab: {fileID: 4001440834320603284, guid: 7c3c1e07e9de2074b98d6e3c932f6a66,
+  poacherPrefab: {fileID: 8616182010629568472, guid: 52331357578469248ad32fd427b1008e,
+    type: 3}
+  farmerPrefab: {fileID: 919132149155446097, guid: 0044a4ebacadd4143b8f9374f99cb324,
     type: 3}

@@ -9,8 +9,13 @@ public class PoacherAI : MonoBehaviour
     public Animator anim;
     public ParticleSystem smokeEffect;
     public WorldControl WC;
+    public Vector2 entryPointRange;
+    public float entryPointZ;
     GridController gridCon;
     BirdsControl bc;
+
+    bool enteredLevel;
+    float entryPoint;
 
     bool hasTarget;
     GameObject trap;
@@ -20,11 +25,14 @@ public class PoacherAI : MonoBehaviour
     Vector3 retrieveTrapPosition;
     Vector3 hidePosition;
     bool canCapture;
+    bool gotWatered;
 
     //transformation related
     GameObject pModel;
     GameObject[] cacti;
     int cactusIdx;
+
+    GameObject fleeFromPlayer;
 
     public bool HasTarget { get => hasTarget; set => hasTarget = value; }
     public Vector3 CurrTargetDest { get => currTargetDest; set => currTargetDest = value; }
@@ -33,6 +41,8 @@ public class PoacherAI : MonoBehaviour
     public bool CanCapture { get => canCapture; set => canCapture = value; }
     public Vector3 RetrieveTrapPosition { get => retrieveTrapPosition; set => retrieveTrapPosition = value; }
     public TrapController TrapCon { get => trapCon; set => trapCon = value; }
+    public bool GotWatered { get => gotWatered; set => gotWatered = value; }
+    public GameObject FleeFromPlayer { get => fleeFromPlayer; set => fleeFromPlayer = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -42,12 +52,26 @@ public class PoacherAI : MonoBehaviour
 
         pModel = transform.GetChild(1).gameObject;
         cacti = new GameObject[] { transform.GetChild(2).gameObject, transform.GetChild(3).gameObject };
+
+        entryPoint = Random.Range(entryPointRange.x, entryPointRange.y);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!hasTarget && bc.hasOccupiedTrees())
+        if (!enteredLevel)
+        {
+            if (transform.position.x > entryPoint)
+            {
+                this.transform.parent = null;
+                this.GetComponent<Animator>().SetBool("EnterLevel", true);
+                this.transform.position = new Vector3(transform.position.x, transform.position.y, entryPointZ);
+                this.transform.rotation = Quaternion.identity;
+                enteredLevel = true;
+            }
+        }
+
+        if (!hasTarget && bc.FindTargetTree())
         {
             if(bc.FindTargetTreeForPoacher(out trapPosition, out currTargetDest, out hidePosition))
             {
@@ -113,6 +137,28 @@ public class PoacherAI : MonoBehaviour
         Destroy(trap);
 
         hasTarget = false;
+    }
+
+    public void GetOnlyTrap()
+    {
+        trapCon.dustEffect.Play();
+
+        List<GameObject> birdsInTrap = trapCon.BirdsInTrap;
+        foreach (GameObject bird in birdsInTrap)
+        {
+            bird.GetComponent<BirdAI>().ReturnToTree();
+        }
+        gridCon.RemoveGameObjectOfScale(trap, 1);
+        Destroy(trap);
+
+        hasTarget = false;
+    }
+
+    public void GetWatered(GameObject player)
+    {
+        fleeFromPlayer = player;
+        Debug.Log("get watered");
+        gotWatered = true;
     }
 
     //public void StartWalking(Vector3 init, Vector3 dest)

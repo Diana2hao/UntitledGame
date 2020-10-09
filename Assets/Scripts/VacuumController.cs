@@ -20,6 +20,10 @@ public class VacuumController : InteractableController
 
     public Vector3 holdPositionOffset;
 
+    public AudioSource vacuumAirSound;
+    public AudioSource vacuumPoopSound;
+    public AudioSource vacuumFullBeepSound;
+
     float extendPercent = 0f;
     float openPercent = 0f;
     float fillPercent = 0f;
@@ -54,7 +58,6 @@ public class VacuumController : InteractableController
     {
         if (isVacuuming && IsOnPoop && fillPercent < maxPercent)
         {
-            //TODO: make vacuuming-liquid sound
             if (isEmpty)
             {
                 AddFirstPoop();
@@ -82,17 +85,34 @@ public class VacuumController : InteractableController
     public void VacuumSwitch()
     {
         isVacuuming = !isVacuuming;
-        Debug.Log(isVacuuming ? "switch on" : "switch off");
-        //TODO: switch vacuuming-air sound on and off
+        //Debug.Log(isVacuuming ? "switch on" : "switch off");
+        if (isVacuuming)
+        {
+            if (fillPercent >= maxPercent)
+            {
+                vacuumFullBeepSound.Play();
+                isVacuuming = false;
+            }
+            else
+            {
+                vacuumAirSound.Play();
+            }
+        }
+        else
+        {
+            vacuumAirSound.Stop();
+            vacuumPoopSound.Stop();
+        }
+        
     }
 
-    public void SwitchPoop(PoopSplatter poop)
+    public void SwitchPoop(GameObject poop)
     {
         if(currPoop != null)
         {
             currPoop.StopVacuum();
         }
-        currPoop = poop;
+        currPoop = poop.GetComponent<PoopSplatter>();
         if (isVacuuming && IsOnPoop && fillPercent < maxPercent)
         {
             currPoop.StartVacuum();
@@ -154,12 +174,15 @@ public class VacuumController : InteractableController
     {
         DeactivateRigidbody(true);
         Extend(true);
+        vacuumAirSound.Stop();
+        vacuumPoopSound.Stop();
     }
 
     public void PlaceOnStation()
     {
         DeactivateRigidbody();
         Extend(true);
+        vacuumAirSound.Stop();
     }
 
     //ie hold or place
@@ -220,6 +243,7 @@ public class VacuumController : InteractableController
     IEnumerator Fill()
     {
         isFilling = true;
+        vacuumPoopSound.Play();
         currPoop.StartVacuum();
         
         while (fillPercent < maxPercent)
@@ -228,6 +252,7 @@ public class VacuumController : InteractableController
             {
                 currPoop.StopVacuum();
                 isFilling = false;
+                vacuumPoopSound.Stop();
                 yield break;
             }
             
@@ -239,6 +264,11 @@ public class VacuumController : InteractableController
         fillPercent = maxPercent;
         currPoop.StopVacuum();
         isFilling = false;
+        isVacuuming = false;
+        
+        vacuumFullBeepSound.Play();
+        vacuumPoopSound.Stop();
+        vacuumAirSound.Stop();
     }
 
     IEnumerator Unfill(float amount)

@@ -12,6 +12,7 @@ public class GrownTree
     public List<GameObject> birds;
     public bool[] occupied;
     public int birdCount;
+    public int birdOnTree;
     public int maxBird;
     public bool isPoacherTarget;
 
@@ -31,6 +32,7 @@ public class GrownTree
         birds = new List<GameObject>();
         occupied = new bool[restPositions.Count];
         birdCount = 0;
+        birdOnTree = 0;
         maxBird = restPositions.Count;
         isPoacherTarget = false;
     }

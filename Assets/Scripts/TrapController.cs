@@ -9,9 +9,11 @@ public class TrapController : MonoBehaviour
     public ParticleSystem dustEffect;
     
     List<GameObject> birdsInTrap;
+    bool isTriggered;
 
     public PoacherAI PAI { get => pAI; set => pAI = value; }
     public List<GameObject> BirdsInTrap { get => birdsInTrap; set => birdsInTrap = value; }
+    public bool IsTriggered { get => isTriggered; set => isTriggered = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,7 @@ public class TrapController : MonoBehaviour
 
     public void TriggerTrap()
     {
+        isTriggered = true;
         anim.SetBool("isTriggered", true);
     }
 

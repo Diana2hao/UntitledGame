@@ -19,7 +19,7 @@ public class BirdAI : MonoBehaviour
     Quaternion restRotation;
     float angleOffset;
 
-    GameObject targetTree;
+    GrownTree targetTree;
     int restPosIdx;
     Vector3 unitDir;
     float currentHeight;
@@ -35,17 +35,19 @@ public class BirdAI : MonoBehaviour
     TrapController trap;
     Vector3 trapDest;
 
+    bool isReturningToTree;
+
     PoopSplatter poop = null;
-    bool canPoop = true;
+    public bool canPoop = true;
 
     GridController gridCon;
 
-    GameObject LC;
+    public GameObject LC;
 
     
     public Vector3 TargetRestPosition { get => targetRestPosition; set => targetRestPosition = value; }
     public Quaternion RestRotation { get => restRotation; set => restRotation = value; }
-    public GameObject TargetTree { get => targetTree; set => targetTree = value; }
+    public GrownTree TargetTree { get => targetTree; set => targetTree = value; }
     public int RestPosIdx { get => restPosIdx; set => restPosIdx = value; }
     public bool IsAttractedToTrap { get => isAttractedToTrap; set => isAttractedToTrap = value; }
     public TrapController Trap { get => trap; set => trap = value; }
@@ -54,12 +56,14 @@ public class BirdAI : MonoBehaviour
     public bool IsDeploying { get => isDeploying; set => isDeploying = value; }
     public Vector3 CurrTarget { get => currTarget; set => currTarget = value; }
     public bool CanPoop { get => canPoop; set => canPoop = value; }
+    public bool IsReturningToTree { get => isReturningToTree; set => isReturningToTree = value; }
 
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = Camera.main;
-        LC = GameObject.Find("LevelControl");
+        LC = GameObject.FindGameObjectWithTag("LevelControl");
+        Debug.Log(LC);
         Deploy();
         isFlyingAway = false;
 
@@ -114,10 +118,14 @@ public class BirdAI : MonoBehaviour
             {
                 StartCoroutine("CorrectRotation");
                 isDeploying = false;
-                LC.GetComponent<WorldControl>().AddBird(this.gameObject);
+                LC.GetComponent<WorldControl>().AddBird();
             }
-            
         }
+        
+        //if (poop != null)
+        //{
+        //    canPoop = !poop.IsVacuuming;
+        //}
 
         //Flying Away
         //if (isFlyingAway)
@@ -134,7 +142,7 @@ public class BirdAI : MonoBehaviour
         //        //destroy
         //        Destroy(this.gameObject);
         //    }
-                
+
         //}
     }
 
@@ -160,7 +168,7 @@ public class BirdAI : MonoBehaviour
     public void FlyAway()
     {
         isDeploying = false;
-        currTarget = (transform.position - targetTree.transform.position) + transform.position;
+        currTarget = (transform.position - targetTree.tree.transform.position) + transform.position;
         isFlyingAway = true;
     }
 
@@ -193,6 +201,13 @@ public class BirdAI : MonoBehaviour
         }
     }
 
+    public void ReturnToTree()
+    {
+        isReturningToTree = true;
+        currTarget = targetRestPosition;
+        anim.SetInteger("State", (int)BirdTransition.FLY);
+    }
+
     public void Poop()
     {
         if (poop == null)
@@ -201,9 +216,14 @@ public class BirdAI : MonoBehaviour
             poopPosition += poopPrefab.transform.position;
             GameObject go = Instantiate(poopPrefab, poopPosition, poopPrefab.transform.rotation);
             poop = go.GetComponent<PoopSplatter>();
-            poop.BAI = this;
+            poop.AddBird(this.gameObject);
         }
         poopEffect.Play();
+    }
+
+    public void PoopToBeDestroyed()
+    {
+        poop.CanBeDestroyed = true;
     }
 
     void OnParticleCollision(GameObject other)

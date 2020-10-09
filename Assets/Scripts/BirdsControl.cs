@@ -89,7 +89,7 @@ public class BirdsControl : MonoBehaviour
         BirdAI ba = bird.GetComponent<BirdAI>();
 
         //find the tree this bird is on
-        GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t=>t.tree==ba.TargetTree);
+        GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t=>t.tree==ba.TargetTree.tree);
 
         gt.RemoveBird(bird);
 
@@ -127,7 +127,7 @@ public class BirdsControl : MonoBehaviour
         BirdAI ba = bird.GetComponent<BirdAI>();
         ba.TargetRestPosition = tree.tree.transform.position + tree.restPositions[idx];
         ba.RestRotation = tree.restRotations[idx];
-        ba.TargetTree = tree.tree;
+        ba.TargetTree = tree;
         ba.RestPosIdx = idx;
 
         //increase this tree's birdcount and add this bird to this tree
@@ -144,15 +144,18 @@ public class BirdsControl : MonoBehaviour
     }
 
     //Poacher Interactions--------------------------------------------------------------------------
-    public bool hasOccupiedTrees()
+    public bool FindTargetTree()
     {
-        return OccupiedTrees.Count > 0;
+        List<GrownTree> fullTrees = OccupiedTrees.ToList().FindAll(t => t.birdOnTree == t.maxBird);
+        return fullTrees.Count > 0;
     }
 
     public bool FindTargetTreeForPoacher(out Vector3 trapPosition, out Vector3 poacherPosition, out Vector3 hidePosition)
     {
+        List<GrownTree> fullTrees = OccupiedTrees.ToList().FindAll(t => t.birdOnTree == t.maxBird);
+
         //find a random tree that is not targeted by a poacher yet
-        foreach(GrownTree gt in OccupiedTrees.OrderBy(a => rnd.Next()).ToList())
+        foreach (GrownTree gt in fullTrees.OrderBy(a => rnd.Next()).ToList())
         {
             //check if there is empty grids around the tree
             if (gridCon.FindTrapPosition(gt.tree, gt.scale, out trapPosition, out poacherPosition, out hidePosition))

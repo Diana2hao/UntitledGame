@@ -27,6 +27,13 @@ public class IdleState : StateMachineBehaviour
             fAI = animator.GetComponent<FarmerAI>();
         }
 
+        if (navAgent == null)
+        {
+            navAgent = animator.GetComponent<NavMeshAgent>();
+        }
+
+        navAgent.enabled = true;
+
         timer = 0f;
     }
 

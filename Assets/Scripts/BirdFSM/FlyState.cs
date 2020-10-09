@@ -41,14 +41,21 @@ public class FlyState : StateMachineBehaviour
                 if (birdAI.IsAttractedToTrap)
                 {
                     animator.SetInteger("State", (int)BirdTransition.WALK);
+                    birdAI.IsAttractedToTrap = false;
                 }
 
                 if (birdAI.IsFlyingAway)
                 {
                     //destroy
+                    birdAI.PoopToBeDestroyed();
                     Destroy(birdAI.gameObject);
                     //TODO: reduce player points
+                }
 
+                if (birdAI.IsReturningToTree)
+                {
+                    animator.SetInteger("State", (int)BirdTransition.IDLEONTREE);
+                    birdAI.IsReturningToTree = false;
                 }
                 
             }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class childTriggerController : BucketController
+public class childTriggerController : InteractableController
 {
     GameObject parent;
 

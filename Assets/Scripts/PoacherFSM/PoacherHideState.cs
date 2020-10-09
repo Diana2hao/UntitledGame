@@ -6,6 +6,9 @@ public class PoacherHideState : StateMachineBehaviour
 {
     PoacherAI PAI;
 
+    float waitTime;
+    float waitTimer = 0f;
+
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
@@ -15,18 +18,32 @@ public class PoacherHideState : StateMachineBehaviour
         }
 
         PAI.Camouflage();
+        waitTime = Random.Range(5f, 10f);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //if enought birds entered trap, start capturing
+        //if enought birds entered trap, wait for some time and start capturing
         if (PAI.CanCapture)
         {
-            PAI.CurrTargetDest = PAI.RetrieveTrapPosition;
+            waitTimer += Time.deltaTime;
+            if (waitTimer > waitTime)
+            {
+                PAI.CurrTargetDest = PAI.RetrieveTrapPosition;
+                PAI.DeCamouflage();
+                animator.SetInteger("State", (int)PoacherTransition.CAPTURE);
+                PAI.CanCapture = false;
+
+                waitTimer = 0f;
+                waitTime = Random.Range(5f, 10f);
+            }
+        }
+
+        if (PAI.GotWatered)
+        {
             PAI.DeCamouflage();
-            animator.SetInteger("State", (int)PoacherTransition.CAPTURE);
-            PAI.CanCapture = false;
+            animator.SetInteger("State", (int)PoacherTransition.FLEE);
         }
     }
 

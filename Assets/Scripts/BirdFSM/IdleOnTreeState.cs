@@ -28,6 +28,8 @@ public class IdleOnTreeState : StateMachineBehaviour
 
         waitTime = Random.Range(3f, 6f);
         poopTime = Random.Range(5f, 10f);
+
+        birdAI.TargetTree.birdOnTree += 1;
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -60,13 +62,13 @@ public class IdleOnTreeState : StateMachineBehaviour
         }
     }
 
-    
+
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        birdAI.TargetTree.birdOnTree -= 1;
+    }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()
     //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
