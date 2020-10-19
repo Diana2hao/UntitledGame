@@ -49,7 +49,7 @@ public class GlobalControl : MonoBehaviour
 
     public void SavePlayer( int modelNumber, string controlScheme, InputDevice inputDevice)
     {
-        PlayerSettings ps = new PlayerSettings(modelNumber, controlScheme, inputDevice);
+        PlayerSettings ps = new PlayerSettings(0, modelNumber, controlScheme, inputDevice);
         playerSettings.Add(ps);
     }
 

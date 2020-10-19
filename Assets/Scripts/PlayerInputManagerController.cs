@@ -31,14 +31,15 @@ public class PlayerInputManagerController : MonoBehaviour
         
     }
 
-    void OnPlayerJoined()
+    void OnPlayerJoined(PlayerInput pi)
     {
         PlayerNum++;
-        if (PlayerNum == 1)
-        {
-            GameObject mainPlayer = GameObject.Find("Player");
-            Players.Add(mainPlayer);
-        }
+        pi.gameObject.transform.position = spawnPoint.transform.position;
+        //if (PlayerNum == 1)
+        //{
+        //    GameObject mainPlayer = GameObject.Find("Player");
+        //    Players.Add(mainPlayer);
+        //}
 
     }
 
@@ -49,14 +50,16 @@ public class PlayerInputManagerController : MonoBehaviour
 
     void JoinKeyboardPlayer(GameObject player)
     {
-        if(player.GetComponent<PlayerController>().KeyboardShared == false && PlayerNum < maxPlayer)
+        PlayerController pc = player.GetComponent<PlayerController>();
+        if (pc.KeyboardShared == false && PlayerNum < maxPlayer)
         {
-            player.GetComponent<PlayerController>().KeyboardShared = true;
+            pc.KeyboardShared = true;
+            pc.pi.SwitchCurrentControlScheme("KeyboardLeft", pc.pi.devices.ToArray());
             var p2 = PlayerInput.Instantiate(playerPrefab, controlScheme: "KeyboardRight", pairWithDevice: Keyboard.current);
             GameObject p2g = p2.gameObject;
             p2g.transform.position = spawnPoint.transform.position;
             p2g.GetComponent<PlayerController>().KeyboardShared = true;
-            Players.Add(p2g);
+            //Players.Add(p2g);
         }
         
     }

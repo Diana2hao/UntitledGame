@@ -23,6 +23,8 @@ public class FarmerAI : MonoBehaviour
     GameObject[] allPlayers;
     HashSet<GameObject> fleeFromPlayers;
 
+    GameObject LC;
+
     public GameObject CurrTarget { get => currTarget; set => currTarget = value; }
     public HashSet<GameObject> FleeFromPlayers { get => fleeFromPlayers; set => fleeFromPlayers = value; }
     public bool HasTarget { get => hasTarget; set => hasTarget = value; }
@@ -37,6 +39,8 @@ public class FarmerAI : MonoBehaviour
         allPlayers = GameObject.FindGameObjectsWithTag("Player");
         fleeFromPlayers = new HashSet<GameObject>();
         hasTarget = false;
+
+        LC = GameObject.FindGameObjectWithTag("LevelControl");
 
         entryPoint = Random.Range(entryPointRange.x, entryPointRange.y);
     }
@@ -103,6 +107,7 @@ public class FarmerAI : MonoBehaviour
     public void DestroyCurrentTarget()
     {
         tl.treeList.Remove(currTarget);
+        LC.GetComponent<LevelControl>().MinusTree();
         gridCon.RemoveGameObjectOfScale(currTarget, currTarget.GetComponent<TreeControl>().FinalSize);
         hasTarget = false;
         Destroy(currTarget.gameObject);

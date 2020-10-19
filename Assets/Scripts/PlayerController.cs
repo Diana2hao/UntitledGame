@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource dashSound;
     public AudioSource throwSound;
     public AudioSource waterSound;
+    public GameObject flowerPrefab;
 
     //from input, or movement related
     Vector2 inputMovement;
@@ -81,7 +82,10 @@ public class PlayerController : MonoBehaviour
         rb = this.GetComponent<Rigidbody>();
         tl = GameObject.FindObjectOfType<TreeListController>();
         sg = GameObject.FindObjectOfType<SurfaceGenerator>();
-        gridCon = GameObject.Find("Grid").GetComponent<GridController>();
+        if(GameObject.Find("Grid") != null)
+        {
+            gridCon = GameObject.Find("Grid").GetComponent<GridController>();
+        }
 
         interactableColliders = new List<Collider>();
         lastInteractObject = null;
@@ -90,7 +94,8 @@ public class PlayerController : MonoBehaviour
         //todo: hasplant condition
         HasPlant = true;
 
-        pi = this.GetComponent<PlayerInput>();
+        AddFlower();
+
         LC = GameObject.FindGameObjectWithTag("LevelControl");
     }
 
@@ -371,7 +376,7 @@ public class PlayerController : MonoBehaviour
                 gridCon.AddGameObjectOfScale(transT.transform.position, currentHandheldObject, curObjectSize);
 
                 OnDrop();
-                LC.GetComponent<WorldControl>().AddTree();
+                LC.GetComponent<LevelControl>().AddTree();
 
                 //regenerate surface
                 //sg.surface.BuildNavMesh();
@@ -476,5 +481,10 @@ public class PlayerController : MonoBehaviour
     public void SavePlayer()
     {
         GlobalControl.Instance.SavePlayer(curModel, pi.currentControlScheme, pi.devices[0]);
+    }
+
+    public void AddFlower()
+    {
+        playerModels[curModel].GetComponent<PlayerModel>().AddFlower(flowerPrefab);
     }
 }

@@ -48,8 +48,8 @@ public class FlyState : StateMachineBehaviour
                 {
                     //destroy
                     birdAI.PoopToBeDestroyed();
+                    birdAI.ReducePlayerPoints();
                     Destroy(birdAI.gameObject);
-                    //TODO: reduce player points
                 }
 
                 if (birdAI.IsReturningToTree)

@@ -19,6 +19,7 @@ TagManager:
   - Poacher
   - FertilizerBag
   - LevelControl
+  - Earth
   layers:
   - Default
   - TransparentFX

@@ -42,7 +42,7 @@ public class BirdAI : MonoBehaviour
 
     GridController gridCon;
 
-    public GameObject LC;
+    public GameObject levelCon;
 
     
     public Vector3 TargetRestPosition { get => targetRestPosition; set => targetRestPosition = value; }
@@ -62,8 +62,8 @@ public class BirdAI : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        LC = GameObject.FindGameObjectWithTag("LevelControl");
-        Debug.Log(LC);
+        levelCon = GameObject.FindGameObjectWithTag("LevelControl");
+        Debug.Log(levelCon);
         Deploy();
         isFlyingAway = false;
 
@@ -118,7 +118,7 @@ public class BirdAI : MonoBehaviour
             {
                 StartCoroutine("CorrectRotation");
                 isDeploying = false;
-                LC.GetComponent<WorldControl>().AddBird();
+                levelCon.GetComponent<LevelControl>().AddBird();
             }
         }
         
@@ -224,6 +224,11 @@ public class BirdAI : MonoBehaviour
     public void PoopToBeDestroyed()
     {
         poop.CanBeDestroyed = true;
+    }
+
+    public void ReducePlayerPoints()
+    {
+        levelCon.GetComponent<LevelControl>().MinusBird();
     }
 
     void OnParticleCollision(GameObject other)

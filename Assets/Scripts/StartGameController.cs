@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class StartGameController : InteractableController
 {
     public PlayerInputManagerController pm;
+    public LevelLoader loader;
 
     Renderer rd;
     int playerNum;
@@ -45,7 +46,9 @@ public class StartGameController : InteractableController
         if (playerNum == pm.PlayerNum)
         {
             //load next scene
-            SceneManager.LoadScene("SpM_L1");
+            //SceneManager.LoadScene("SpM_L1");
+            pm.GetComponent<PlayerInputManager>().DisableJoining();
+            loader.LoadNextLevel();
         }
     }
 }

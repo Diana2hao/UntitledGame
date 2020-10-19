@@ -8,7 +8,7 @@ public class PoacherAI : MonoBehaviour
     public GameObject trapPrefab;
     public Animator anim;
     public ParticleSystem smokeEffect;
-    public WorldControl WC;
+    public LevelControl levelCon;
     public Vector2 entryPointRange;
     public float entryPointZ;
     GridController gridCon;
@@ -131,6 +131,7 @@ public class PoacherAI : MonoBehaviour
         foreach(GameObject bird in birdsInTrap)
         {
             bc.RemoveABird(bird);
+            bird.GetComponent<BirdAI>().ReducePlayerPoints();
             Destroy(bird);
         }
         gridCon.RemoveGameObjectOfScale(trap, 1);
