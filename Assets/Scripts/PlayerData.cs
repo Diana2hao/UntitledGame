@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public static class PlayerData
 {
+    public static bool isPlayingCutscene = false;
+
     public static int playerCount;
 
     public static List<PlayerSettings> AllPlayers = new List<PlayerSettings>();

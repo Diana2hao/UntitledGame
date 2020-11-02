@@ -43,7 +43,7 @@ public class HelpController : InteractableController
     {
         PlayerInput pi = player.GetComponent<PlayerInput>();
         if (pi.currentControlScheme.Contains("Keyboard")) {
-            pm.SendMessage("JoinKeyboardPlayer", player);
+            pm.JoinKeyboardPlayer(player);
         }
     }
 }

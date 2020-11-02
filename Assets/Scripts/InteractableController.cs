@@ -9,16 +9,5 @@ public class InteractableController : MonoBehaviour
     public virtual void OnPlayerInteract(GameObject player) { }
     public virtual void OnDrop() { }
     public virtual bool OnThrow(float throwForce) { return false; }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

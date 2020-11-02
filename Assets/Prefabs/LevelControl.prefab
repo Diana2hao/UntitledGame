@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7160976308020458807}
   m_Layer: 0
   m_Name: LevelControl
-  m_TagString: Untagged
+  m_TagString: LevelControl
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -47,3 +47,6 @@ MonoBehaviour:
     type: 3}
   farmerPrefab: {fileID: 919132149155446097, guid: 0044a4ebacadd4143b8f9374f99cb324,
     type: 3}
+  raft: {fileID: 0}
+  birdScore: {fileID: 0}
+  treeScore: {fileID: 0}

@@ -30,8 +30,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3324514928071704536}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.538, y: 0.049, z: 12.778}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.2, y: 1.8472548, z: 1.818907}
   m_Children:
   - {fileID: 6280947447470588423}
   m_Father: {fileID: 0}
@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rd: {fileID: 3829168844553707021}
-  holdPositionOffset: {x: 0, y: -0.083, z: -0.192}
+  holdPositionOffset: {x: 0, y: -0.27, z: -0.192}
   holdRotationOffset: {x: 0, y: 0.70710677, z: 0, w: -0.70710677}
 --- !u!114 &5686596461099419521
 MonoBehaviour:
@@ -155,7 +155,7 @@ GameObject:
   - component: {fileID: 8057593693950739585}
   m_Layer: 10
   m_Name: BagTrigger
-  m_TagString: Untagged
+  m_TagString: FertilizerBag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -185,7 +185,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.41, y: 0.59, z: 0.52}
+  m_Size: {x: 0.46478453, y: 0.59, z: 0.52}
   m_Center: {x: 0.0000000037252903, y: 0.17991193, z: -0.00000087171793}
 --- !u!114 &8057593693950739585
 MonoBehaviour:

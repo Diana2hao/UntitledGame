@@ -12,10 +12,18 @@ public class LevelLoader : MonoBehaviour
     public GameObject loadingScreen;
     public Slider loadingBar;
 
+    public bool isUFOLevel;
+    public GameObject playerPrefab;
+    public List<Vector3> playerInitialPositions;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Debug.Log(PlayerData.AllPlayers.Count);
+        if(!isUFOLevel && PlayerData.AllPlayers.Count != 0)
+        {
+            LoadPlayerInfos();
+        }
     }
 
     // Update is called once per frame
@@ -24,14 +32,14 @@ public class LevelLoader : MonoBehaviour
         
     }
 
-    public void LoadNextLevel()
+    public void LoadNextLevel(int levelIndex)
     {
         if(SceneManager.GetActiveScene().buildIndex == 0)
         {
             SavePlayerInfos();
         }
 
-        StartCoroutine(LoadLevel(SceneManager.GetActiveScene().buildIndex + 1));
+        StartCoroutine(LoadLevel(levelIndex));
     }
 
     private void SavePlayerInfos()
@@ -39,6 +47,20 @@ public class LevelLoader : MonoBehaviour
         foreach(PlayerInput pi in PlayerInput.all)
         {
             PlayerData.AddPlayer(pi.playerIndex, pi.gameObject.GetComponent<PlayerController>().curModel, pi.currentControlScheme, pi.devices[0]);
+        }
+    }
+
+    private void LoadPlayerInfos()
+    {
+        int i = 0;
+        foreach(PlayerSettings ps in PlayerData.AllPlayers)
+        {
+            Debug.Log("player");
+            PlayerInput pi = PlayerInput.Instantiate(playerPrefab, controlScheme: ps.controlScheme, playerIndex: ps.index, pairWithDevices: ps.inputDevice);
+            pi.gameObject.GetComponent<PlayerController>().curModel = ps.modelNumber;
+            pi.gameObject.transform.position = playerInitialPositions[i];
+
+            i++;
         }
     }
 

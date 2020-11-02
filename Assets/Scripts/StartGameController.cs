@@ -48,7 +48,7 @@ public class StartGameController : InteractableController
             //load next scene
             //SceneManager.LoadScene("SpM_L1");
             pm.GetComponent<PlayerInputManager>().DisableJoining();
-            loader.LoadNextLevel();
+            loader.LoadNextLevel(1);
         }
     }
 }

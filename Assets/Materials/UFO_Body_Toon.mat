@@ -72,10 +72,10 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _RimLightBlend: 0
-    - _RimLightSize: 0.718
+    - _RimLightSize: 0.5
     - _RimThreshold: 0.621
     - _ShadowBlend: 0.068
-    - _ShadowSize: 0.7
+    - _ShadowSize: 0.25
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

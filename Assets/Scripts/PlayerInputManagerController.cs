@@ -48,7 +48,7 @@ public class PlayerInputManagerController : MonoBehaviour
 
     }
 
-    void JoinKeyboardPlayer(GameObject player)
+    public void JoinKeyboardPlayer(GameObject player)
     {
         PlayerController pc = player.GetComponent<PlayerController>();
         if (pc.KeyboardShared == false && PlayerNum < maxPlayer)

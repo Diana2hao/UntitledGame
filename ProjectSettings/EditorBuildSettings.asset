@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Earth.unity
     guid: 09acfbe44663abc4ea4725c2639c7863
   - enabled: 1
+    path: Assets/Scenes/SpixMacaw/SpM_Region.unity
+    guid: 0e3934ecbcc6f0841b14e342bff72e96
+  - enabled: 1
     path: Assets/Scenes/SpixMacaw/SpM_L1.unity
     guid: f5e9a3f09f9a692498641482cc6be414
   m_configObjects:

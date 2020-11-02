@@ -245,7 +245,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &813741668
 MonoBehaviour:
@@ -698,6 +698,10 @@ MonoBehaviour:
   transitionTime: 2
   loadingScreen: {fileID: 813741665}
   loadingBar: {fileID: 1706629406}
+  isUFOLevel: 0
+  playerPrefab: {fileID: 2237767362246116592, guid: 2c2beb7a5f2df7a478c945ee741e392a,
+    type: 3}
+  playerInitialPositions: []
 --- !u!1 &8932279134978131467
 GameObject:
   m_ObjectHideFlags: 0
@@ -758,7 +762,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &8932279134978131464
 MonoBehaviour:

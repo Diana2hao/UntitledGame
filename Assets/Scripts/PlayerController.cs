@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -42,8 +43,8 @@ public class PlayerController : MonoBehaviour
     GameObject LC;
 
     //models
-    List<GameObject> playerModels;
-    public int curModel;
+    List<GameObject> playerModels = new List<GameObject>();
+    public int curModel = 0;
     int modelCount;
 
     //Interactions
@@ -61,20 +62,27 @@ public class PlayerController : MonoBehaviour
     GameObject tPrefab;
     GameObject transT;
 
-    
+    //pausemenu
+    public PauseMenu pauseMenu;
+
     public bool HasPlant { get => hasPlant; set => hasPlant = value; }
     public GameObject CurBoxarea { get => curBoxarea; set => curBoxarea = value; }
     public bool KeyboardShared { get => keyboardShared; set => keyboardShared = value; }
     public GameObject CurrentHandheldObject { get => currentHandheldObject; set => currentHandheldObject = value; }
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        //if (SceneManager.GetActiveScene().buildIndex != 0)
+        //{
+        //    pauseMenu = GameObject.Find("Canvas/PauseMenu").GetComponent<PauseMenu>();
+        //}
+
         //get all children player models
-        playerModels = new List<GameObject>();
         GetAllChildren();
-        curModel = 0;
         modelCount = playerModels.Count;
+        ChangeModel(curModel);
 
         anim = playerModels[curModel].GetComponent<Animator>();
 
@@ -247,6 +255,17 @@ public class PlayerController : MonoBehaviour
         anim = playerModels[curModel].GetComponent<Animator>();
     }
 
+    public void ChangeModel(int index)
+    {
+        foreach(GameObject m in playerModels)
+        {
+            m.SetActive(false);
+        }
+
+        curModel = index;
+        playerModels[curModel].SetActive(true);
+    }
+
     private GameObject GetCurrentInteractObject()
     {
         if (interactableColliders.Count == 0)
@@ -353,11 +372,23 @@ public class PlayerController : MonoBehaviour
 
     void OnMove(InputValue value)
     {
-        inputMovement = value.Get<Vector2>();
+        if (!PlayerData.isPlayingCutscene)
+        {
+            inputMovement = value.Get<Vector2>();
+        }
+        else
+        {
+            inputMovement = Vector2.zero;
+        }
     }
 
     void OnInteract()
     {
+        if (PlayerData.isPlayingCutscene)
+        {
+            return;
+        }
+
         //if has sth in hand, take actions base on the thing
         if(currentHandheldObject != null)
         {
@@ -421,11 +452,21 @@ public class PlayerController : MonoBehaviour
 
     void OnDash()
     {
+        if (PlayerData.isPlayingCutscene)
+        {
+            return;
+        }
+
         isDashing = true;
     }
 
     public void OnDrop()
     {
+        if (PlayerData.isPlayingCutscene)
+        {
+            return;
+        }
+
         if (currentHandheldObject != null)
         {
             anim.SetBool("isHoldingObject", false);
@@ -444,6 +485,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnThrow()
     {
+        if (PlayerData.isPlayingCutscene)
+        {
+            return;
+        }
+
         if (currentHandheldObject != null)
         {
             if (currentHandheldObject.GetComponent<InteractableController>().OnThrow(throwForce))
@@ -461,6 +507,15 @@ public class PlayerController : MonoBehaviour
                 currentHandheldObject = null;
             }
         }
+    }
+
+    void OnMenu()
+    {
+        if(pauseMenu == null)
+        {
+            pauseMenu = (PauseMenu)Resources.FindObjectsOfTypeAll(typeof(PauseMenu))[0];
+        }
+        pauseMenu.PauseUnpause();
     }
 
     void OnDeviceLost()
@@ -485,6 +540,7 @@ public class PlayerController : MonoBehaviour
 
     public void AddFlower()
     {
-        playerModels[curModel].GetComponent<PlayerModel>().AddFlower(flowerPrefab);
+        
+        playerModels[curModel].GetComponent<PlayerModel>().AddFlower(flowerPrefab, pi.playerIndex);
     }
 }
