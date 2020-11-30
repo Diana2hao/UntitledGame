@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlantDistributorController : InteractableController
+public class PlantDistributorController : MonoBehaviour, IInteractable
 {
     public GameObject currentPlant;
 
@@ -35,13 +35,13 @@ public class PlantDistributorController : InteractableController
 
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         rd.materials[0].EnableKeyword("_EMISSION");
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -50,7 +50,7 @@ public class PlantDistributorController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         if (player.GetComponent<PlayerController>().CurrentHandheldObject == null && plantReady)
         {
@@ -61,7 +61,17 @@ public class PlantDistributorController : InteractableController
             tree.transform.GetChild(0).GetComponent<BoxCollider>().enabled = false;
 
             player.GetComponent<PlayerController>().Hold(tree, this.transform.GetChild(0).GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity);
+            
         }
     }
 
+    public void OnDrop()
+    {
+        
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
+    }
 }

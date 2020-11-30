@@ -48,11 +48,20 @@ public class PoacherIdleState : StateMachineBehaviour
         {
             if (PAI.HasTarget)
             {
-                animator.SetInteger("State", (int)PoacherTransition.SETTRAP);
+                if(PAI.WanderTimeBeforeCatch < 3)
+                {
+                    PAI.WanderTimeBeforeCatch++;
+                    animator.SetInteger("State", (int)FarmerTransition.WANDER);
+                }
+                else
+                {
+                    PAI.WanderTimeBeforeCatch = 0;
+                    animator.SetInteger("State", (int)PoacherTransition.SETTRAP);
+                }
             }
             else
             {
-                animator.SetInteger("State", (int)Transition.WANDER);
+                animator.SetInteger("State", (int)FarmerTransition.WANDER);
             }
 
             timer = 0f;

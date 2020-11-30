@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 976469931081770154}
   - component: {fileID: 9102036638194683034}
   - component: {fileID: 7869758234837637523}
-  - component: {fileID: 5686596461099419521}
   m_Layer: 10
   m_Name: FertilizerBag
   m_TagString: FertilizerBag
@@ -130,18 +129,6 @@ MonoBehaviour:
   rd: {fileID: 3829168844553707021}
   holdPositionOffset: {x: 0, y: -0.27, z: -0.192}
   holdRotationOffset: {x: 0, y: 0.70710677, z: 0, w: -0.70710677}
---- !u!114 &5686596461099419521
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3324514928071704536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6628d7b6b1f108e4e95044dc885a4509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &7405161160281049309
 GameObject:
   m_ObjectHideFlags: 0

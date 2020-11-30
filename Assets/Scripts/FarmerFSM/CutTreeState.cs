@@ -45,7 +45,7 @@ public class CutTreeState : StateMachineBehaviour
                 fAI.DestroyCurrentTarget();
 
                 //after tree destroyed, goes back to idle state
-                animator.SetInteger("State", (int)Transition.IDLE);
+                animator.SetInteger("State", (int)FarmerTransition.IDLE);
 
             }
         }

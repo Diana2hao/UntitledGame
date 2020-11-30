@@ -150,7 +150,7 @@ public class BirdsControl : MonoBehaviour
         return fullTrees.Count > 0;
     }
 
-    public bool FindTargetTreeForPoacher(out Vector3 trapPosition, out Vector3 poacherPosition, out Vector3 hidePosition)
+    public bool FindTargetTreeForPoacher(out Vector3 trapPosition, out Vector3 poacherPosition, out Vector3 hidePosition, out GrownTree grownTree)
     {
         List<GrownTree> fullTrees = OccupiedTrees.ToList().FindAll(t => t.birdOnTree == t.maxBird);
 
@@ -160,11 +160,13 @@ public class BirdsControl : MonoBehaviour
             //check if there is empty grids around the tree
             if (gridCon.FindTrapPosition(gt.tree, gt.scale, out trapPosition, out poacherPosition, out hidePosition))
             {
+                grownTree = gt;
                 return true;
             }
         }
 
         trapPosition = poacherPosition = hidePosition = Vector3.zero;
+        grownTree = null;
         return false;
     }
 
@@ -181,15 +183,21 @@ public class BirdsControl : MonoBehaviour
 
     private void SendBirdsToTrap(TrapController trap)
     {
-        HashSet<GameObject> trees = gridCon.FindTreeNextToTrap(trap);
-        foreach(GameObject go in trees)
+        //HashSet<GameObject> trees = gridCon.FindTreeNextToTrap(trap);
+        //foreach(GameObject go in trees)
+        //{
+        //    GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t => t.tree == go);
+        //    foreach(GameObject bird in gt.birds)
+        //    {
+        //        Vector3 randDest = FindRandomDestination(trap);
+        //        bird.GetComponent<BirdAI>().AddTrap(trap, randDest);
+        //    }
+        //}
+
+        foreach (GameObject bird in trap.TargetTree.birds)
         {
-            GrownTree gt = GrownTrees.Concat(OccupiedTrees).ToList().Find(t => t.tree == go);
-            foreach(GameObject bird in gt.birds)
-            {
-                Vector3 randDest = FindRandomDestination(trap);
-                bird.GetComponent<BirdAI>().AddTrap(trap, randDest);
-            }
+            Vector3 randDest = FindRandomDestination(trap);
+            bird.GetComponent<BirdAI>().AddTrap(trap, randDest);
         }
     }
 

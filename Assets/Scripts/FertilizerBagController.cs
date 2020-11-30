@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FertilizerBagController : InteractableController
+public class FertilizerBagController : MonoBehaviour, IInteractable
 {
     public MeshRenderer rd;
     public Vector3 holdPositionOffset;
@@ -33,13 +33,13 @@ public class FertilizerBagController : InteractableController
         Destroy(this.gameObject);
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         rd.material.EnableKeyword("_EMISSION");
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -48,7 +48,7 @@ public class FertilizerBagController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         if (player.GetComponent<PlayerController>().Hold(this.gameObject, this.transform.GetChild(0).GetComponent<BoxCollider>(), holdPositionOffset, holdRotationOffset))
         {
@@ -56,15 +56,15 @@ public class FertilizerBagController : InteractableController
         }
     }
 
-    public override void OnDrop()
+    public void OnDrop()
     {
         DeactivateRigidbody(true);
     }
 
-    public override bool OnThrow(float throwForce)
+    public bool OnThrow(float throwForce)
     {
         DeactivateRigidbody(true);
-        this.GetComponent<Rigidbody>().AddForce(this.transform.parent.forward * throwForce);
+        this.GetComponent<Rigidbody>().AddForce((this.transform.parent.forward + this.transform.parent.up).normalized * throwForce);
 
         return true;
     }

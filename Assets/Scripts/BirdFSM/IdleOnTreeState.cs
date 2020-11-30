@@ -57,7 +57,7 @@ public class IdleOnTreeState : StateMachineBehaviour
             {
                 birdAI.Poop();
                 poopTimer = 0f;
-                poopTime = Random.Range(5f, 10f);
+                poopTime = Random.Range(15f, 20f);
             }
         }
     }

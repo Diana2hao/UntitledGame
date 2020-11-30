@@ -4,15 +4,23 @@ using UnityEngine;
 
 public class StartScreen : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public Animator anim;
+
     void Start()
     {
-        
+        if (!PlayerData.gameStarted)
+        {
+            PlayerData.isPlayingCutscene = true;
+        }
+        else
+        {
+            this.gameObject.SetActive(false);
+            PlayerData.isPlayingCutscene = false;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void StartGame()
     {
-        
+        anim.SetBool("playerJoined", true);
     }
 }

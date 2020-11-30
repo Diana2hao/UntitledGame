@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NotificationBehavior: 0
-  m_MaxPlayerCount: 1
+  m_MaxPlayerCount: 4
   m_AllowJoining: 1
   m_JoinBehavior: 1
   m_PlayerJoinedEvent:
@@ -107,3 +107,8 @@ MonoBehaviour:
   spawnPoint: {fileID: 0}
   playerPrefab: {fileID: 2237767362246116592, guid: 2c2beb7a5f2df7a478c945ee741e392a,
     type: 3}
+  startScreen: {fileID: 0}
+  spawnAnim: {fileID: 0}
+  PlayerTutPrefab: {fileID: 8659617343276172623, guid: 5f9d7b82aa949ee49888d7bfbc518c05,
+    type: 3}
+  tutorialManager: {fileID: 0}

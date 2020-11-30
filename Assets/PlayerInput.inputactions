@@ -203,7 +203,7 @@
                 {
                     "name": "",
                     "id": "795c58ad-2fba-4b0c-9fb4-c4b357f12f87",
-                    "path": "<XInputController>/dpad",
+                    "path": "<Gamepad>/dpad",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -291,7 +291,7 @@
                 {
                     "name": "",
                     "id": "a236e1f7-e9c0-4325-8980-4fac3a434176",
-                    "path": "<XInputController>/buttonSouth",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -323,28 +323,6 @@
                 },
                 {
                     "name": "",
-                    "id": "0f76666e-9f14-4bc1-a362-88c075e7083e",
-                    "path": "<XInputController>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4746de7f-ee1a-47b6-9d95-609bcf306a40",
-                    "path": "<XInputController>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "c342eeaa-e243-4818-9bd3-45d5118cb70b",
                     "path": "<Keyboard>/leftCtrl",
                     "interactions": "",
@@ -368,7 +346,7 @@
                 {
                     "name": "",
                     "id": "e1535cd7-2c00-480f-a94f-17b87e2ab1c1",
-                    "path": "<XInputController>/buttonEast",
+                    "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -379,7 +357,7 @@
                 {
                     "name": "",
                     "id": "28157f25-1017-450b-8570-ff7f254938c9",
-                    "path": "<XInputController>/buttonWest",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -488,6 +466,17 @@
                 },
                 {
                     "name": "",
+                    "id": "55c046fd-03b9-4ba5-8fda-e08c924f09b6",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "92facfbd-6594-432d-a845-d809341210f3",
                     "path": "<Keyboard>/ctrl",
                     "interactions": "",
@@ -566,7 +555,7 @@
                 {
                     "name": "",
                     "id": "bb12a167-8ffd-4c68-a85d-5cc1f3e7c926",
-                    "path": "<XInputController>/start",
+                    "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",

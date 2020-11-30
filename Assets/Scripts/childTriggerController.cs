@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class childTriggerController : InteractableController
+public class childTriggerController : MonoBehaviour, IInteractable
 {
     GameObject parent;
 
@@ -18,23 +18,28 @@ public class childTriggerController : InteractableController
 
     }
 
-    public override void glow()
+    public void glow()
     {
-        parent.GetComponent<InteractableController>().glow();
+        parent.GetComponent<IInteractable>().glow();
     }
 
-    public override void unglow()
+    public void unglow()
     {
-        parent.GetComponent<InteractableController>().unglow();
+        parent.GetComponent<IInteractable>().unglow();
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
-        parent.GetComponent<InteractableController>().OnPlayerInteract(player);
+        parent.GetComponent<IInteractable>().OnPlayerInteract(player);
     }
 
-    public override void OnDrop()
+    public void OnDrop()
     {
-        parent.GetComponent<InteractableController>().OnDrop();
+        parent.GetComponent<IInteractable>().OnDrop();
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
     }
 }

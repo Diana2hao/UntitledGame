@@ -44,10 +44,10 @@ public class TreeGrowingBar : MonoBehaviour
     public void AddOneBagOfFert()
     {
         bagCount++;
-        fertBarImage.fillAmount = 1f / totalFertilizerBagsAddable * bagCount;
+        fertBarImage.fillAmount = (1f / totalFertilizerBagsAddable) * bagCount;
     }
 
-    public float GetBagCount()
+    public int GetBagCount()
     {
         return bagCount;
     }

@@ -128,7 +128,7 @@ public class UFOController : MonoBehaviour
 
         if (!PauseMenu.GameIsPaused && nextSceneEntrance != null)
         {
-            nextSceneEntrance.GetComponent<EntranceController>().EnterNextScene();
+            nextSceneEntrance.GetComponent<IEntrance>().EnterNextScene();
         }
     }
 

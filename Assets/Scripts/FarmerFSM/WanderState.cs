@@ -29,7 +29,7 @@ public class WanderState : StateMachineBehaviour
         //if reached destination, go back to idle state
         if (!navAgent.hasPath)
         {
-            animator.SetInteger("State", (int)Transition.IDLE);
+            animator.SetInteger("State", (int)FarmerTransition.IDLE);
         }
     }
 

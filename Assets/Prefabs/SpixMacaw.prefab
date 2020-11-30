@@ -4311,13 +4311,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navAgent: {fileID: 2432552935152866799}
   anim: {fileID: 4973787125866554655}
-  speed: 3.5
+  speed: 5
   poopEffect: {fileID: 8893702480394454225}
   poopPrefab: {fileID: 2194520343499585702, guid: c069cb56480f28d439ba218e1fb5eff4,
     type: 3}
-  spiralRadius: 0.2
-  spiralFrequency: 1.5
+  spiralRadius: 0.8
+  spiralFrequency: 0.5
   turnSampleFreq: 0.2
+  levelCon: {fileID: 0}
 --- !u!136 &4863890170584659600
 CapsuleCollider:
   m_ObjectHideFlags: 0

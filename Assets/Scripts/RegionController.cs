@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RegionController : EntranceController
+public class RegionController : MonoBehaviour, IEntrance
 {
     public Canvas boardCanvas;
-    public int nextSceneIndex;
+    //public int nextSceneIndex;
+    public int loadInsIdx;
 
     LevelLoader loader;
     
@@ -22,9 +23,19 @@ public class RegionController : EntranceController
         
     }
 
-    public override void EnterNextScene()
+    public void EnterNextScene()
     {
-        loader.LoadNextLevel(nextSceneIndex);
+        if (Application.CanStreamedLevelBeLoaded(this.gameObject.name))
+        {
+            loader.LoadNextLevel(this.gameObject.name, loadInsIdx);
+        }
+
+        //if (nextSceneIndex < 0)
+        //{
+        //    return;
+        //}
+
+        //loader.LoadNextLevel(nextSceneIndex, loadInsIdx);
     }
 
     private void OnTriggerEnter(Collider other)

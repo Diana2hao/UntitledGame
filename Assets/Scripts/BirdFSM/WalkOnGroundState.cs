@@ -24,7 +24,7 @@ public class WalkOnGroundState : StateMachineBehaviour
         }
 
         navAgent.enabled = true;
-        targetDest = birdAI.Trap.transform.position;
+        targetDest = birdAI.TrapPosition;
         navAgent.SetDestination(targetDest);
     }
 

@@ -7,13 +7,15 @@ public class TrapController : MonoBehaviour
     Animator anim;
     PoacherAI pAI;
     public ParticleSystem dustEffect;
-    
+
+    GrownTree targetTree;
     List<GameObject> birdsInTrap;
     bool isTriggered;
 
     public PoacherAI PAI { get => pAI; set => pAI = value; }
     public List<GameObject> BirdsInTrap { get => birdsInTrap; set => birdsInTrap = value; }
     public bool IsTriggered { get => isTriggered; set => isTriggered = value; }
+    public GrownTree TargetTree { get => targetTree; set => targetTree = value; }
 
     // Start is called before the first frame update
     void Start()

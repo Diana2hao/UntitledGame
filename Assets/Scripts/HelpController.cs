@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class HelpController : InteractableController
+public class HelpController : MonoBehaviour, IInteractable
 {
     public PlayerInputManagerController pm;
 
@@ -24,13 +24,13 @@ public class HelpController : InteractableController
 
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         rd.material.SetColor("_EmissionColor", new Color(0.067f, 0.515f, 1.0f, 1.0f));
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -39,11 +39,21 @@ public class HelpController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         PlayerInput pi = player.GetComponent<PlayerInput>();
         if (pi.currentControlScheme.Contains("Keyboard")) {
             pm.JoinKeyboardPlayer(player);
         }
+    }
+
+    public void OnDrop()
+    {
+        
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
     }
 }

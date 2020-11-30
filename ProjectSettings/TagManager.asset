@@ -20,6 +20,7 @@ TagManager:
   - FertilizerBag
   - LevelControl
   - Earth
+  - TutBalls
   layers:
   - Default
   - TransparentFX

@@ -69,7 +69,6 @@ GameObject:
   - component: {fileID: 443788601768102079}
   - component: {fileID: 1627426277366128041}
   - component: {fileID: 7475203701053404196}
-  - component: {fileID: 5910850445860790436}
   - component: {fileID: 4177782876467893895}
   - component: {fileID: 2094200304}
   - component: {fileID: 2094200305}
@@ -192,18 +191,6 @@ MonoBehaviour:
   vacuumAirSound: {fileID: 2094200304}
   vacuumPoopSound: {fileID: 2094200305}
   vacuumFullBeepSound: {fileID: 7024548080462347696}
---- !u!114 &5910850445860790436
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4675932084243852796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6628d7b6b1f108e4e95044dc885a4509, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &4177782876467893895
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -38,7 +38,7 @@ public class WalkToTargetState : StateMachineBehaviour
         {
             //stop the navmeshagent
             navAgent.ResetPath();
-            animator.SetInteger("State", (int)Transition.CUTTREE);
+            animator.SetInteger("State", (int)FarmerTransition.CUTTREE);
         }
     }
 

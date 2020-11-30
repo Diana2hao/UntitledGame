@@ -10,7 +10,7 @@ enum LastActiveBar
 }
 
 //handles player interaction, tree growth, and tree cutting (farmer interaction)
-public class TreeControl : InteractableController
+public class TreeControl : MonoBehaviour, IInteractable
 {
     //3 growth stage models (childs) plus one indicator model
     GameObject Tree0;
@@ -57,6 +57,9 @@ public class TreeControl : InteractableController
     //birds related
     List<Vector3> restSpots;
     List<Quaternion> restRotations;
+
+    //game stats related
+    GameObject LC;  //level control
     
 
     public bool IsPlanted { get => isPlanted; set => isPlanted = value; }
@@ -65,6 +68,7 @@ public class TreeControl : InteractableController
     public List<Vector3> RestSpots { get => restSpots; set => restSpots = value; }
     public List<Quaternion> RestRotations { get => restRotations; set => restRotations = value; }
     public int CurTree { get => curTree; set => curTree = value; }
+    public bool IsGrowing { get => isGrowing; set => isGrowing = value; }
 
 
     // Start is called before the first frame update
@@ -116,6 +120,8 @@ public class TreeControl : InteractableController
         //get grid controller
         gridCon = GameObject.Find("Grid").GetComponent<GridController>();
 
+        LC = GameObject.FindGameObjectWithTag("LevelControl");
+
     }
 
     // Update is called once per frame
@@ -138,8 +144,8 @@ public class TreeControl : InteractableController
             canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
 
             //glow(); make the new model glow (without increase interacting player count)
-            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
-            rdArray[curTree].material.SetFloat("_Emission", 1);
+            //rdArray[curTree].material.SetFloat("_Emission", 1);
+            if (playerNum > 0) { rdArray[curTree].material.EnableKeyword("_EMISSION"); }
 
             //set trigger collider size for current model
             ResizeCollider();
@@ -150,6 +156,7 @@ public class TreeControl : InteractableController
                 isFullyGrown = false;
                 //TODO: add interaction with birds control
                 birdsControl.RemoveGrownTree(this);
+                LC.GetComponent<LevelControl>().MinusTree();
             }
 
             //set health back to max, reset other 2 bar
@@ -284,8 +291,8 @@ public class TreeControl : InteractableController
         canvas.transform.position = new Vector3(transform.position.x, barHeights[curTree], transform.position.z);
 
         //glow(); make the new model glow (without increase interacting player count)
-        //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
-        rdArray[curTree].material.SetFloat("_Emission", 1);
+        //rdArray[curTree].material.SetFloat("_Emission", 1);
+        if (playerNum > 0) { rdArray[curTree].material.EnableKeyword("_EMISSION"); }
 
         //set trigger collider size for current model
         ResizeCollider();
@@ -300,6 +307,8 @@ public class TreeControl : InteractableController
             //reset grow bar
             growBar.gameObject.SetActive(false);
             growBar.ResetBar();
+
+            LC.GetComponent<LevelControl>().AddTree();
         }
         else
         {
@@ -307,24 +316,24 @@ public class TreeControl : InteractableController
         }
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
-        //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.35f, 0.35f, 0.35f, 1.0f));
-        rdArray[curTree].material.SetFloat("_Emission", 1);
+        //rdArray[curTree].material.SetFloat("_Emission", 1);
+        rdArray[curTree].material.EnableKeyword("_EMISSION");
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if(playerNum == 0)
         {
-            //rdArray[curTree].material.SetColor("_EmissionColor", new Color(0.001f, 0.001f, 0.001f, 1.0f));
-            rdArray[curTree].material.SetFloat("_Emission", 0);
+            //rdArray[curTree].material.SetFloat("_Emission", 0);
+            rdArray[curTree].material.DisableKeyword("_EMISSION");
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         PlayerController pc = player.GetComponent<PlayerController>();
         if (!isPlanted)
@@ -341,7 +350,7 @@ public class TreeControl : InteractableController
                 waterTree();
             }
 
-            else if(isGrowing && growBar.GetBagCount() < 3 && pc.Fertilize())
+            else if(isGrowing && growBar.GetBagCount() < growBar.totalFertilizerBagsAddable && pc.Fertilize())
             {
                 growBar.AddOneBagOfFert();
                 speedUpSound.Play();
@@ -366,14 +375,17 @@ public class TreeControl : InteractableController
 
         healthBar.gameObject.SetActive(false);
 
-        //set which bar back to active
-        if (lastActiveBar == (int)LastActiveBar.WATERBAR || lastActiveBar == (int)LastActiveBar.NONE)
+        //if not fully grown, set which bar back to active
+        if (curTree < 2)
         {
-            waterBar.gameObject.SetActive(true);
-        }
-        else
-        {
-            growBar.gameObject.SetActive(false);
+            if (lastActiveBar == (int)LastActiveBar.WATERBAR || lastActiveBar == (int)LastActiveBar.NONE)
+            {
+                waterBar.gameObject.SetActive(true);
+            }
+            else
+            {
+                growBar.gameObject.SetActive(false);
+            }
         }
 
         yield return null;
@@ -389,17 +401,26 @@ public class TreeControl : InteractableController
         return false;
     }
 
-    public override void OnDrop()
+    public void OnDrop()
     {
         PickUp(false);
     }
 
-    public override bool OnThrow(float throwForce)
+    public bool OnThrow(float throwForce)
     {
         PickUp(false);
-        this.GetComponent<Rigidbody>().AddForce(this.transform.parent.forward * throwForce);
+        this.GetComponent<Rigidbody>().AddForce((this.transform.parent.forward + this.transform.parent.up).normalized * throwForce);
 
         return true;
+    }
+
+    public void Plant()
+    {
+        isPlanted = true;
+        waterBar.gameObject.SetActive(true);
+        this.transform.GetChild(0).GetComponent<BoxCollider>().enabled = false;
+        this.transform.GetChild(1).GetComponent<BoxCollider>().enabled = false;
+        this.transform.GetChild(2).GetComponent<BoxCollider>().enabled = false;
     }
 
     private void PickUp(bool up)

@@ -47,7 +47,7 @@ MonoBehaviour:
   birdPrefab: {fileID: 8475997403966078931, guid: b36608f157d39ef4785d03dbab03afab,
     type: 3}
   birdNavAgent: {fileID: 6168658661766597689}
-  newDeployTime: 20
+  newDeployTime: 10
 --- !u!195 &6168658661766597689
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BucketController : InteractableController
+public class BucketController : MonoBehaviour, IInteractable
 {
     public ParticleSystem splashEffect;
 
@@ -32,8 +32,10 @@ public class BucketController : InteractableController
 
     public void FillWithWater()
     {
+        Debug.Log("fill");
         if (!isFilled)
         {
+            Debug.Log("fill success");
             isFilled = true;
             rd.materials[1].SetColor("_BaseColor", new Color(0.184f, 0.678f, 0.953f, 0.816f));
         }
@@ -41,21 +43,23 @@ public class BucketController : InteractableController
 
     public void EmptyWater()
     {
+        Debug.Log("unfill");
         if (isFilled)
         {
+            Debug.Log("unfill success");
             isFilled = false;
             splashEffect.Play();
             rd.materials[1].SetColor("_BaseColor", new Color(0.184f, 0.678f, 0.953f, 0.0f));
         }
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         rd.material.SetColor("_EmissionColor", new Color(0.114f, 0.114f, 0.114f, 1.0f));
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -64,7 +68,7 @@ public class BucketController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         if(player.GetComponent<PlayerController>().Hold(this.gameObject, this.transform.GetChild(0).GetComponent<BoxCollider>(), Vector3.zero, Quaternion.identity))
         {
@@ -74,7 +78,7 @@ public class BucketController : InteractableController
         }
     }
 
-    public override void OnDrop()
+    public void OnDrop()
     {
         this.GetComponent<Rigidbody>().isKinematic = false;
         this.GetComponent<BoxCollider>().enabled = true;
@@ -82,7 +86,7 @@ public class BucketController : InteractableController
     }
 
 
-    public override bool OnThrow(float throwForce)
+    public bool OnThrow(float throwForce)
     {
         if (!IsFilled)
         {
@@ -90,7 +94,7 @@ public class BucketController : InteractableController
             rb.isKinematic = false;
             this.GetComponent<BoxCollider>().enabled = true;
             this.transform.GetChild(0).GetComponent<BoxCollider>().enabled = true;
-            rb.AddForce(this.transform.parent.forward * throwForce);
+            rb.AddForce((this.transform.parent.forward + this.transform.parent.up).normalized * throwForce);
 
             return true;
         }

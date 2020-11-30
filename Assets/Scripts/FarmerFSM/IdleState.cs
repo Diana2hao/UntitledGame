@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public enum Transition
+public enum FarmerTransition
 {
     IDLE,
     WANDER,
@@ -47,11 +47,11 @@ public class IdleState : StateMachineBehaviour
         {
             if (fAI.HasTarget)
             {
-                animator.SetInteger("State", (int)Transition.WALKTOTARGET);
+                animator.SetInteger("State", (int)FarmerTransition.WALKTOTARGET);
             }
             else
             {
-                animator.SetInteger("State", (int)Transition.WANDER);
+                animator.SetInteger("State", (int)FarmerTransition.WANDER);
             }
             
             timer = 0f;

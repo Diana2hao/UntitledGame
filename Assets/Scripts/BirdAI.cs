@@ -23,6 +23,7 @@ public class BirdAI : MonoBehaviour
     int restPosIdx;
     Vector3 unitDir;
     float currentHeight;
+    float maxHeight;
     bool isDeploying;
     Vector3 midDest;
 
@@ -34,11 +35,12 @@ public class BirdAI : MonoBehaviour
     bool isAttractedToTrap;
     TrapController trap;
     Vector3 trapDest;
+    Vector3 trapPosition;
 
     bool isReturningToTree;
 
     PoopSplatter poop = null;
-    public bool canPoop = true;
+    bool canPoop = true;
 
     GridController gridCon;
 
@@ -57,13 +59,13 @@ public class BirdAI : MonoBehaviour
     public Vector3 CurrTarget { get => currTarget; set => currTarget = value; }
     public bool CanPoop { get => canPoop; set => canPoop = value; }
     public bool IsReturningToTree { get => isReturningToTree; set => isReturningToTree = value; }
+    public Vector3 TrapPosition { get => trapPosition; set => trapPosition = value; }
 
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = Camera.main;
         levelCon = GameObject.FindGameObjectWithTag("LevelControl");
-        Debug.Log(levelCon);
         Deploy();
         isFlyingAway = false;
 
@@ -91,26 +93,30 @@ public class BirdAI : MonoBehaviour
                 //}
                 //else
                 //{
-                    //if near final dest, start landing animation
-                    if (Vector3.Distance(transform.position, targetRestPosition) < 2f)
-                    {
-                        anim.SetInteger("State", (int)BirdTransition.IDLEONTREE);
-                    }
+                //if near final dest, start landing animation
+                if (Vector3.Distance(transform.position, targetRestPosition) < 2f)
+                {
+                    anim.SetInteger("State", (int)BirdTransition.IDLEONTREE);
+                }
 
-                    //move towards intermediate destination
-                    if (Vector3.Distance(transform.position, midDest) > 0.001f)
-                    {
-                        float step = speed * Time.deltaTime; // calculate distance to move
-                        transform.position = Vector3.MoveTowards(transform.position, midDest, step);
-                        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(midDest - transform.position), 0.05f);
-                    }
-                    else
-                    {
-                        //get new intermediate spiral destination
-                        currentHeight -= turnSampleFreq;
-                        if (currentHeight < 0f) { currentHeight = 0f; }
-                        midDest = GetSpiralPosition(currentHeight);
-                    } 
+                //move towards intermediate destination
+                if (Vector3.Distance(transform.position, midDest) > 0.001f)
+                {
+                    float step = speed * Time.deltaTime; // calculate distance to move
+
+                    //Vector3 screenPoint = Camera.main.WorldToViewportPoint(transform.position);
+                    step *= Mathf.Lerp(1, 4, currentHeight/maxHeight);
+                        
+                    transform.position = Vector3.MoveTowards(transform.position, midDest, step);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(midDest - transform.position), 0.1f);
+                }
+                else
+                {
+                    //get new intermediate spiral destination
+                    currentHeight -= turnSampleFreq;
+                    if (currentHeight < 0f) { currentHeight = 0f; }
+                    midDest = GetSpiralPosition(currentHeight);
+                } 
                 //}
             }
             //if at final destination, stop moving and inform level control
@@ -150,7 +156,8 @@ public class BirdAI : MonoBehaviour
     {
         unitDir = (mainCamera.transform.position - targetRestPosition).normalized;
         angleOffset = restRotation.eulerAngles.y;
-        currentHeight = (mainCamera.transform.position - targetRestPosition).y;
+        maxHeight = (mainCamera.transform.position - targetRestPosition).y;
+        currentHeight = maxHeight / 2;
         Vector3 initP = GetSpiralPosition(currentHeight);
         this.transform.position = initP;
         isDeploying = true;
@@ -179,6 +186,7 @@ public class BirdAI : MonoBehaviour
         isAttractedToTrap = true;
         Trap = aTrap;
         trapDest = randDest;
+        trapPosition = Trap.transform.position;
     }
 
     IEnumerator WaitRandomTime(TrapController trap, Vector3 randDest)
@@ -192,7 +200,6 @@ public class BirdAI : MonoBehaviour
 
     IEnumerator CorrectRotation()
     {
-        Debug.Log("correcting");
         transform.rotation = Quaternion.Slerp(transform.rotation, RestRotation, 0.1f);
         while (Mathf.Abs(Quaternion.Dot(transform.rotation, RestRotation)) < 0.999f)
         {

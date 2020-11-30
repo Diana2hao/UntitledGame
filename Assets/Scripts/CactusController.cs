@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CactusController : InteractableController
+public class CactusController : MonoBehaviour, IInteractable
 {
     // Start is called before the first frame update
     void Start()
@@ -16,18 +16,18 @@ public class CactusController : InteractableController
         
     }
 
-    public override void glow()
+    public void glow()
     {
 
     }
 
-    public override void unglow()
+    public void unglow()
     {
 
     }
 
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         PlayerController pc = player.GetComponent<PlayerController>();
 
@@ -41,13 +41,17 @@ public class CactusController : InteractableController
     {
         if (this.transform.parent.CompareTag("Poacher"))
         {
-            Debug.Log("poacher");
             transform.parent.GetComponent<PoacherAI>().GetWatered(player);
-        }
-        else
-        {
-            Debug.Log("normal cactus");
         }
     }
 
+    public void OnDrop()
+    {
+        
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
+    }
 }

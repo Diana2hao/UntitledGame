@@ -19,6 +19,10 @@ public class LevelControl : MonoBehaviour
 
     int birdsPerPoacher;
     int treesPerFarmer;
+    bool poacherFull;
+
+    public int TotalBird { get => totalBird; }
+    public int TotalTree { get => totalTree; }
 
     // Start is called before the first frame update
     void Start()
@@ -30,12 +34,12 @@ public class LevelControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(birdIncrement >= birdsPerPoacher)
+        if(birdIncrement >= birdsPerPoacher && !poacherFull)
         {
             //deploy a poacher to the next raft
             raft.AddPoacher();
             birdIncrement = 0;
-            birdsPerPoacher = Random.Range(4, 9);
+            poacherFull = true;
         }
 
         if(treeIncrement >= treesPerFarmer)
@@ -43,7 +47,7 @@ public class LevelControl : MonoBehaviour
             //deploy a farmer to the next raft
             raft.AddFarmer();
             treeIncrement = 0;
-            treesPerFarmer = Random.Range(2, 5);
+            treesPerFarmer = Random.Range(6, 8);
         }
     }
 

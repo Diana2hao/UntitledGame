@@ -24,13 +24,16 @@ public class PoacherAI : MonoBehaviour
     Vector3 trapPosition;
     Vector3 retrieveTrapPosition;
     Vector3 hidePosition;
+    GrownTree targetTree;
     bool canCapture;
     bool gotWatered;
+    int wanderTimeBeforeCatch = 0;
 
     //transformation related
     GameObject pModel;
     GameObject[] cacti;
     int cactusIdx;
+    bool isHiding;
 
     GameObject fleeFromPlayer;
 
@@ -43,6 +46,8 @@ public class PoacherAI : MonoBehaviour
     public TrapController TrapCon { get => trapCon; set => trapCon = value; }
     public bool GotWatered { get => gotWatered; set => gotWatered = value; }
     public GameObject FleeFromPlayer { get => fleeFromPlayer; set => fleeFromPlayer = value; }
+    public bool IsHiding { get => isHiding; }
+    public int WanderTimeBeforeCatch { get => wanderTimeBeforeCatch; set => wanderTimeBeforeCatch = value; }
 
     // Start is called before the first frame update
     void Start()
@@ -73,7 +78,7 @@ public class PoacherAI : MonoBehaviour
 
         if (!hasTarget && bc.FindTargetTree())
         {
-            if(bc.FindTargetTreeForPoacher(out trapPosition, out currTargetDest, out hidePosition))
+            if(bc.FindTargetTreeForPoacher(out trapPosition, out currTargetDest, out hidePosition, out targetTree))
             {
                 hasTarget = true;
                 retrieveTrapPosition = currTargetDest + (hidePosition - currTargetDest) * 0.2f; //when trap is dropped on ground, need some extra space for poacher to stand
@@ -93,6 +98,7 @@ public class PoacherAI : MonoBehaviour
         trap = Instantiate(trapPrefab, trapPosition, trapRotation);
         trapCon = trap.GetComponent<TrapController>();
         trapCon.PAI = this;
+        TrapCon.TargetTree = targetTree;
         bc.AddTrap(trapCon);
         gridCon.AddGameObjectOfScale(trapPosition, trap, 1);
     }
@@ -111,6 +117,7 @@ public class PoacherAI : MonoBehaviour
         cactusIdx = Random.Range(0, 2);
         cacti[cactusIdx].SetActive(true);
         gridCon.AddGameObjectOfScale(this.transform.position, this.gameObject, 1);
+        isHiding = true;
     }
 
     public void DeCamouflage()
@@ -120,6 +127,7 @@ public class PoacherAI : MonoBehaviour
         pModel.SetActive(true);
         cacti[cactusIdx].SetActive(false);
         gridCon.RemoveGameObjectOfScale(this.gameObject, 1);
+        isHiding = false;
     }
 
     public void GetTrapAndBird()
@@ -144,13 +152,14 @@ public class PoacherAI : MonoBehaviour
     {
         trapCon.dustEffect.Play();
 
-        List<GameObject> birdsInTrap = trapCon.BirdsInTrap;
-        foreach (GameObject bird in birdsInTrap)
+        //List<GameObject> birdsInTrap = trapCon.BirdsInTrap;
+        foreach (GameObject bird in trapCon.TargetTree.birds)
         {
             bird.GetComponent<BirdAI>().ReturnToTree();
         }
         gridCon.RemoveGameObjectOfScale(trap, 1);
-        Destroy(trap);
+        trap.SetActive(false);
+        Destroy(trap, 3f);
 
         hasTarget = false;
     }
@@ -158,7 +167,6 @@ public class PoacherAI : MonoBehaviour
     public void GetWatered(GameObject player)
     {
         fleeFromPlayer = player;
-        Debug.Log("get watered");
         gotWatered = true;
     }
 

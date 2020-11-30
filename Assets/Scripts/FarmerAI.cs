@@ -52,7 +52,6 @@ public class FarmerAI : MonoBehaviour
         {
             if (transform.position.x > entryPoint)
             {
-                Debug.Log("condition met");
                 this.transform.parent = null;
                 this.GetComponent<Animator>().SetBool("EnterLevel", true);
                 this.transform.position = new Vector3(transform.position.x, transform.position.y, entryPointZ);
@@ -99,7 +98,7 @@ public class FarmerAI : MonoBehaviour
                 fleeFromPlayers.Add(player);
 
                 //remember to uncheck "can transition to self" in editor
-                anim.SetInteger("State", (int)Transition.FLEE);
+                anim.SetInteger("State", (int)FarmerTransition.FLEE);
             }
         }
     }
@@ -107,7 +106,6 @@ public class FarmerAI : MonoBehaviour
     public void DestroyCurrentTarget()
     {
         tl.treeList.Remove(currTarget);
-        LC.GetComponent<LevelControl>().MinusTree();
         gridCon.RemoveGameObjectOfScale(currTarget, currTarget.GetComponent<TreeControl>().FinalSize);
         hasTarget = false;
         Destroy(currTarget.gameObject);

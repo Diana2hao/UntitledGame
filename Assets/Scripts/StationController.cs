@@ -9,7 +9,7 @@ enum StationBlendShape
     LIDOPEN
 }
 
-public class StationController : InteractableController
+public class StationController : MonoBehaviour, IInteractable
 {
     public SkinnedMeshRenderer smRenderer;
     public float fillAmountPerSecond;
@@ -53,6 +53,10 @@ public class StationController : InteractableController
     WaitForSeconds FillWait;
 
     public float MaxPercent { get => maxPercent; set => maxPercent = value; }
+    public bool HasVacuum { get => hasVacuum; }
+    public float WaterFillPercent { get => waterFillPercent; }
+    public float BatchAmount { get => batchAmount; }
+    public float PoopPercent { get => poopPercent; }
 
     // Start is called before the first frame update
     void Start()
@@ -76,13 +80,13 @@ public class StationController : InteractableController
         }
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         smRenderer.materials[1].EnableKeyword("_EMISSION");
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -91,7 +95,7 @@ public class StationController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         PlayerController pControl = player.GetComponent<PlayerController>();
         if (pControl.CurrentHandheldObject != null )
@@ -378,5 +382,15 @@ public class StationController : InteractableController
 
         xOffset = 0f;
         smRenderer.materials[5].SetTextureOffset("_BaseMap", new Vector2(xOffset, 0));
+    }
+
+    public void OnDrop()
+    {
+        
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
     }
 }

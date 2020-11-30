@@ -15,7 +15,6 @@ public class RaftController : MonoBehaviour
     public GameObject PoacherPrefab;
     public GameObject FarmerPrefab;
     public int maxEnemyPerRaft = 2;
-    public float testPos;
 
     int poacherReady = 0;
     int farmerReady = 0;
@@ -43,8 +42,6 @@ public class RaftController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        testPos = this.transform.position.x;
-
         if (poacherReady > 0)
         {
             //add poacher to queue

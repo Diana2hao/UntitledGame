@@ -131,7 +131,7 @@ public class GridMap
             {
                 if(!gridArray[x, z].isBlocked())
                 {
-                    Vector3 position = new Vector3(x, 0.001f, z);
+                    Vector3 position = new Vector3(x, 0.06f, z);
                     GameObject m = Object.Instantiate(mosaic, position, Quaternion.Euler(0, 180, 0));
                     m.transform.parent = ms.transform;
                 }
@@ -165,6 +165,12 @@ public class GridMap
             {
                 int x = xOrig + xOffset;
                 int z = zOrig + zOffset;
+                if (x >= width || z >= height)
+                {
+                    plantPosition = new Vector3(0, 0, 0);
+                    return false;
+                }
+
                 if (!gridArray[x, z].isEmpty())
                 {
                     plantPosition = new Vector3(0, 0, 0);

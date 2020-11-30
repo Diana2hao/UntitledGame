@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public GameObject currentPlant;
     public GroundIndicatorController GroundIndicator;
     public float dashForce;
+    public float dashCooldown;
     public ParticleSystem dashEffect;
     public float pushBackDistance;
     public float pushForce;
@@ -20,6 +21,8 @@ public class PlayerController : MonoBehaviour
     public AudioSource waterSound;
     public GameObject flowerPrefab;
 
+    //Tutorial Related
+
     //from input, or movement related
     Vector2 inputMovement;
     bool isDashing = false;
@@ -27,6 +30,7 @@ public class PlayerController : MonoBehaviour
     Vector3 pushedBackDest;
     Vector3 pushedBackDir;
     float pushBackTimer = 0f;
+    float dashCDTime = 0f;
 
     //set numeric value
     float movementSpeed = 5.0F;
@@ -36,7 +40,6 @@ public class PlayerController : MonoBehaviour
     Animator anim;
     CharacterController cc;
     TreeListController tl;
-    SurfaceGenerator sg;
     Rigidbody rb;
     public PlayerInput pi;
     GridController gridCon;
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour
 
     //Interactions
     bool hasPlant;
+    bool isPlantable = false;
     GameObject curBoxarea;
     bool keyboardShared;
     List<Collider> interactableColliders;
@@ -64,12 +68,14 @@ public class PlayerController : MonoBehaviour
 
     //pausemenu
     public PauseMenu pauseMenu;
+    
 
     public bool HasPlant { get => hasPlant; set => hasPlant = value; }
     public GameObject CurBoxarea { get => curBoxarea; set => curBoxarea = value; }
     public bool KeyboardShared { get => keyboardShared; set => keyboardShared = value; }
-    public GameObject CurrentHandheldObject { get => currentHandheldObject; set => currentHandheldObject = value; }
-    
+    public GameObject CurrentHandheldObject { get => currentHandheldObject; }
+    public GameObject CurInteractObject { get => curInteractObject; }
+
 
     // Start is called before the first frame update
     void Start()
@@ -89,7 +95,6 @@ public class PlayerController : MonoBehaviour
         cc = this.GetComponent<CharacterController>();
         rb = this.GetComponent<Rigidbody>();
         tl = GameObject.FindObjectOfType<TreeListController>();
-        sg = GameObject.FindObjectOfType<SurfaceGenerator>();
         if(GameObject.Find("Grid") != null)
         {
             gridCon = GameObject.Find("Grid").GetComponent<GridController>();
@@ -104,6 +109,8 @@ public class PlayerController : MonoBehaviour
 
         AddFlower();
 
+        ActivateProperTutorial();
+
         LC = GameObject.FindGameObjectWithTag("LevelControl");
     }
 
@@ -117,6 +124,8 @@ public class PlayerController : MonoBehaviour
             //intendedPosition = GroundIndicator.GetPlantPosition(this.transform.position, curObjectSize);
             if(gridCon.FindPlantPosition(this.transform.position, this.transform.forward, curObjectSize, out intendedPosition))
             {
+                isPlantable = true;
+
                 if (tPrefab == null)
                 {
                     tPrefab = currentHandheldObject.GetComponent<TreeControl>().TransparentFinalModel;
@@ -124,13 +133,18 @@ public class PlayerController : MonoBehaviour
 
                 if (transT == null)
                 {
-                    transT = Instantiate(tPrefab, intendedPosition + tPrefab.transform.position, Quaternion.Euler(0, 0, 0));
+                    transT = Instantiate(tPrefab, intendedPosition + tPrefab.transform.position, tPrefab.transform.rotation);
                 }
                 else
                 {
                     transT.SetActive(true);
                     transT.transform.position = intendedPosition + tPrefab.transform.position;
                 }
+            }
+            else
+            {
+                isPlantable = false;
+                if (transT != null) { transT.SetActive(false); }
             }
         }
 
@@ -144,6 +158,10 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 direction = new Vector3(inputMovement.x, 0.0F, inputMovement.y);
+
+        Vector3 normalizedDirection = new Vector3(inputMovement.normalized.x, 0.0f, inputMovement.normalized.y);
+
+        dashCDTime += Time.deltaTime;
 
         if (isPushedBack)
         {
@@ -176,13 +194,14 @@ public class PlayerController : MonoBehaviour
                 anim.SetBool("isWalking", true);
                 MoveCharacter(direction);
 
-                if (isDashing)
+                if (isDashing && dashCDTime >= dashCooldown)
                 {
-                    rb.AddForce(direction * dashForce);
+                    rb.AddForce(normalizedDirection.normalized * dashForce);
                     dashEffect.Play(false);
                     dashSound.Play();
-                    isDashing = false;
+                    dashCDTime = 0f;
                 }
+                isDashing = false;
             }
             else
             {
@@ -292,11 +311,11 @@ public class PlayerController : MonoBehaviour
         curInteractObject = GetCurrentInteractObject();
         if (curInteractObject != null && curInteractObject != lastInteractObject)
         {
-            curInteractObject.GetComponent<InteractableController>().glow();
+            curInteractObject.GetComponent<IInteractable>().glow();
         }
         if (lastInteractObject != null && lastInteractObject != curInteractObject)
         {
-            lastInteractObject.GetComponent<InteractableController>().unglow();
+            lastInteractObject.GetComponent<IInteractable>().unglow();
         }
     }
 
@@ -341,6 +360,14 @@ public class PlayerController : MonoBehaviour
         return true;
     }
 
+    public void FailToHold(Collider colliderToBeRemoved)
+    {
+        if (colliderToBeRemoved != null)
+        {
+            interactableColliders.Remove(colliderToBeRemoved);
+        }
+    }
+
     public bool Water()
     {
         if (currentHandheldObject != null && currentHandheldObject.CompareTag("Bucket"))
@@ -375,6 +402,7 @@ public class PlayerController : MonoBehaviour
         if (!PlayerData.isPlayingCutscene)
         {
             inputMovement = value.Get<Vector2>();
+
         }
         else
         {
@@ -394,30 +422,32 @@ public class PlayerController : MonoBehaviour
         {
             if (currentHandheldObject.CompareTag("Plant"))
             {
-                //plant on ground
-                currentHandheldObject.transform.position = transT.transform.position;
-                currentHandheldObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+                if (isPlantable)
+                {
+                    //plant on ground
+                    currentHandheldObject.transform.position = transT.transform.position;
+                    currentHandheldObject.transform.rotation = Quaternion.Euler(0, 0, 0);
 
-                currentHandheldObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-                TreeControl tc = currentHandheldObject.GetComponent<TreeControl>();
-                tc.IsPlanted = true;
-                tc.waterBar.gameObject.SetActive(true);
+                    currentHandheldObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                    TreeControl tc = currentHandheldObject.GetComponent<TreeControl>();
 
-                tl.treeList.Add(currentHandheldObject);
-                gridCon.AddGameObjectOfScale(transT.transform.position, currentHandheldObject, curObjectSize);
+                    tl.treeList.Add(currentHandheldObject);
+                    gridCon.AddGameObjectOfScale(transT.transform.position, currentHandheldObject, curObjectSize);
 
-                OnDrop();
-                LC.GetComponent<LevelControl>().AddTree();
+                    OnDrop();
 
-                //regenerate surface
-                //sg.surface.BuildNavMesh();
+                    tc.Plant();  //disable all children colliders
+                                 
+                    //regenerate surface
+                    //sg.surface.BuildNavMesh();
+                }
             }
             else if (currentHandheldObject.CompareTag("Vacuum"))
             {
                 if (curInteractObject != null && curInteractObject.CompareTag("Station"))
                 {
                     //interaction with station
-                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                    curInteractObject.GetComponent<IInteractable>().OnPlayerInteract(this.gameObject);
                 }
                 else
                 {
@@ -429,7 +459,7 @@ public class PlayerController : MonoBehaviour
             {
                 if(curInteractObject != null)
                 {
-                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                    curInteractObject.GetComponent<IInteractable>().OnPlayerInteract(this.gameObject);
                 }
 
                 //TODO(maybe): if no interact object, pour water anyways
@@ -439,14 +469,14 @@ public class PlayerController : MonoBehaviour
             {
                 if (curInteractObject != null)
                 {
-                    curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+                    curInteractObject.GetComponent<IInteractable>().OnPlayerInteract(this.gameObject);
                 }
             }
         }
         //if nothing in hand, interact with the object in environment
         else if (curInteractObject != null)
         {
-            curInteractObject.GetComponent<InteractableController>().OnPlayerInteract(this.gameObject);
+            curInteractObject.GetComponent<IInteractable>().OnPlayerInteract(this.gameObject);
         }
     }
 
@@ -456,6 +486,7 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
 
         isDashing = true;
     }
@@ -471,7 +502,7 @@ public class PlayerController : MonoBehaviour
         {
             anim.SetBool("isHoldingObject", false);
             currentHandheldObject.transform.parent = null;
-            currentHandheldObject.GetComponent<InteractableController>().OnDrop();
+            currentHandheldObject.GetComponent<IInteractable>().OnDrop();
 
             if (currentHandheldObject.CompareTag("Plant"))
             {
@@ -492,7 +523,7 @@ public class PlayerController : MonoBehaviour
 
         if (currentHandheldObject != null)
         {
-            if (currentHandheldObject.GetComponent<InteractableController>().OnThrow(throwForce))
+            if (currentHandheldObject.GetComponent<IInteractable>().OnThrow(throwForce))
             {
                 throwSound.Play();
                 anim.SetBool("isHoldingObject", false);
@@ -542,5 +573,29 @@ public class PlayerController : MonoBehaviour
     {
         
         playerModels[curModel].GetComponent<PlayerModel>().AddFlower(flowerPrefab, pi.playerIndex);
+    }
+
+    private void ActivateProperTutorial()
+    {
+        //lobby scene
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            this.GetComponent<PlayerTutorialControl>().enabled = true;
+            this.GetComponent<PlayerTutorialControl>().isEnabled = true;
+        }
+
+        //spm level 0
+        if (SceneManager.GetActiveScene().name == "0_0")
+        {
+            this.GetComponent<PlayerGameplayTutR1L0>().enabled = true;
+            this.GetComponent<PlayerGameplayTutR1L0>().isEnabled = true;
+        }
+
+        //spm level 1
+        if (SceneManager.GetActiveScene().name == "0_1")
+        {
+            this.GetComponent<PlayerGameplayTutR1L1>().enabled = true;
+            this.GetComponent<PlayerGameplayTutR1L1>().isEnabled = true;
+        }
     }
 }

@@ -39,7 +39,7 @@ public class FleeState : StateMachineBehaviour
             //check if should stop fleeing
             if (ShouldStopFlee(animator))
             {
-                animator.SetInteger("State", (int)Transition.IDLE);
+                animator.SetInteger("State", (int)FarmerTransition.IDLE);
             }
             else
             {

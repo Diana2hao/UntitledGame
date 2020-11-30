@@ -9,7 +9,7 @@ enum VacuumBlendShape
     FILLED
 }
 
-public class VacuumController : InteractableController
+public class VacuumController : MonoBehaviour, IInteractable
 {
     public SkinnedMeshRenderer smRenderer;
     public float fillAmountPerSecond;
@@ -45,7 +45,8 @@ public class VacuumController : InteractableController
     private Queue<IEnumerator> unfillCoroutineQueue = new Queue<IEnumerator>();
 
     public bool IsOnPoop { get => isOnPoop; set => isOnPoop = value; }
-    public float FillPercent { get => fillPercent; set => fillPercent = value; }
+    public float FillPercent { get => fillPercent; }
+    public bool IsVacuuming { get => isVacuuming; }
 
     // Start is called before the first frame update
     void Start()
@@ -142,7 +143,7 @@ public class VacuumController : InteractableController
         }
     }
 
-    public override void glow()
+    public void glow()
     {
         playerNum += 1;
         smRenderer.materials[1].SetFloat("_Emission", 1);
@@ -150,7 +151,7 @@ public class VacuumController : InteractableController
         smRenderer.materials[4].SetFloat("_Emission", 1);
     }
 
-    public override void unglow()
+    public void unglow()
     {
         playerNum -= 1;
         if (playerNum == 0)
@@ -161,7 +162,7 @@ public class VacuumController : InteractableController
         }
     }
 
-    public override void OnPlayerInteract(GameObject player)
+    public void OnPlayerInteract(GameObject player)
     {
         if (player.GetComponent<PlayerController>().Hold(this.gameObject, this.transform.GetChild(0).GetComponent<BoxCollider>(), holdPositionOffset, Quaternion.identity))
         {
@@ -170,12 +171,17 @@ public class VacuumController : InteractableController
         }
     }
 
-    public override void OnDrop()
+    public void OnDrop()
     {
         DeactivateRigidbody(true);
         Extend(true);
         vacuumAirSound.Stop();
         vacuumPoopSound.Stop();
+    }
+
+    public bool OnThrow(float throwForce)
+    {
+        return false;
     }
 
     public void PlaceOnStation()
@@ -279,7 +285,7 @@ public class VacuumController : InteractableController
             yield return FillWait;
             fillPercent--;
             smRenderer.SetBlendShapeWeight((int)VacuumBlendShape.FILLED, fillPercent);
-            if(FillPercent == 0f)
+            if(fillPercent == 0f)
             {
                 AddFirstPoop(true);
             }
